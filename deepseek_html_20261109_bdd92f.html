@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>疼痛记录 · 病人版</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background: #f0ede6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 12px;
+      font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+
+    .page-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #4a4032;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+      text-align: center;
+      width: 100%;
+    }
+    .page-title .badge-patient {
+      background: #b34a3c;
+      color: #fff;
+      font-size: 12px;
+      padding: 2px 10px;
+      border-radius: 10px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .patient-info {
+      display: flex;
+      gap: 8px 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #fefcf5;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd6c8;
+      font-size: 13px;
+      color: #5a4e3e;
+      width: 100%;
+      max-width: 880px;
+    }
+    .patient-info label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+    .patient-info input {
+      border: 1px solid #ddd6c8;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 13px;
+      width: 100%;
+      min-width: 0;
+      background: #fefcf5;
+      color: #4a4032;
+    }
+    .patient-info input:disabled {
+      background: #f0ede6;
+      color: #8a7c6a;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
+      max-width: 880px;
+    }
+    .toolbar button {
+      padding: 8px 14px;
+      border: 1px solid #c8c0b4;
+      background: #fefcf5;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #4a4032;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      flex: 0 1 auto;
+      white-space: nowrap;
+    }
+    .toolbar button:hover:not(:disabled) { background: #f5f0e6; border-color: #a89a88; }
+    .toolbar button.active { background: #b34a3c; color: #fff; border-color: #9a3f33; }
+    .toolbar button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #f0ede6;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #8a7c6a;
+      margin-bottom: 8px;
+      text-align: center;
+      letter-spacing: 0.3px;
+      line-height: 1.5;
+      padding: 0 6px;
+      width: 100%;
+    }
+    .hint .readonly-tip { color: #b34a3c; font-weight: bold; }
+
+    .canvas-wrap {
+      position: relative;
+      background: #fefcf5;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04),
+        inset 0 0 0 1px rgba(255,255,255,0.8);
+      overflow: hidden;
+      border: 1px solid #ddd6c8;
+      width: 100%;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 100%;
+      touch-action: none;
+      cursor: crosshair;
+    }
+    canvas.readonly { cursor: default !important; }
+
+    .info {
+      display: flex;
+      gap: 8px 16px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #7a6c5a;
+      flex-wrap: wrap;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      max-width: 880px;
+    }
+    .info span b { color: #b34a3c; }
+    .badge-locked {
+      display: inline-block; padding: 1px 8px; background: #e8e2d6;
+      color: #6a5a4a; border-radius: 10px; font-size: 11px; margin-left: 6px;
+    }
+    .badge-readonly {
+      display: inline-block; padding: 1px 8px; background: #f5d0c8;
+      color: #9a3f33; border-radius: 10px; font-size: 11px;
+      margin-left: 6px; font-weight: bold;
+    }
+
+    /* 医生反馈框 —— 加载后自动显示 */
+    .feedback-box {
+      width: 100%;
+      max-width: 880px;
+      margin-top: 14px;
+      background: #fefcf5;
+      border: 2px solid #b34a3c;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: none;
+      font-size: 13px;
+      color: #4a4032;
+      box-shadow: 0 4px 14px rgba(179, 74, 60, 0.15);
+    }
+    .feedback-box h3 {
+      margin: 0 0 10px 0; font-size: 16px; color: #b34a3c;
+      border-bottom: 1px dashed #ddd6c8; padding-bottom: 8px;
+    }
+    .feedback-box .row {
+      margin-bottom: 10px; line-height: 1.6;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 8px;
+    }
+    .feedback-box .row .label {
+      display: inline-block; min-width: 80px; color: #8a7c6a; font-size: 12px;
+      flex: 0 0 auto;
+    }
+    .feedback-box .row .value {
+      color: #4a4032; white-space: pre-wrap; flex: 1 1 200px; min-width: 0;
+    }
+    .feedback-box .empty { color: #a09486; font-style: italic; }
+
+    /* 小屏微调 */
+    @media (max-width: 600px) {
+      body { padding: 8px; }
+      .page-title { font-size: 16px; }
+      .patient-info { padding: 8px 10px; font-size: 12px; }
+      .patient-info label { flex: 1 1 100%; }
+      .toolbar button { padding: 7px 12px; font-size: 12px; }
+      .hint { font-size: 11px; }
+      .info { font-size: 11px; }
+      .feedback-box { padding: 12px 12px; }
+      .feedback-box .row .label { min-width: 70px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-title">疼痛记录 <span class="badge-patient">病人版</span></div>
+
+  <div class="patient-info">
+    <label>姓名 <input id="patientName" type="text" placeholder="请输入姓名" value="张三"></label>
+    <label>ID <input id="patientId" type="text" placeholder="如 P001" value="P001"></label>
+    <label>年龄 <input id="patientAge" type="number" min="0" max="150" placeholder="年龄" value="45"></label>
+  </div>
+
+  <div class="hint" id="hintText">
+    ✏️ 拖拽绘制疼痛曲线 · 靠近自己绘制的数据点可拖拽
+  </div>
+
+  <div class="toolbar">
+    <button id="btnPen" class="active" title="自由绘制折线">✏️ 折线画笔</button>
+    <button id="btnEraser" title="擦除自己绘制的点">🧽 橡皮</button>
+    <button id="btnClear" title="清空所有内容">🗑️ 清空</button>
+    <button id="btnExport" title="导出为 PNG 图片">🖼️ 导出 PNG</button>
+    <button id="btnSaveData" title="保存记录（含病人信息）">💾 保存记录</button>
+    <button id="btnLoadData" title="加载记录（可能是医生处理过的）">📂 加载记录</button>
+    <input type="file" id="fileInput" accept=".json,application/json" style="display: none;">
+  </div>
+
+  <div class="canvas-wrap">
+    <canvas id="chartCanvas" width="880" height="480"></canvas>
+  </div>
+
+  <div class="info">
+    <span>数据点：<b id="pointCount">0</b>
+      <span id="lockedBadge" class="badge-locked" style="display:none;"></span>
+      <span id="readonlyBadge" class="badge-readonly" style="display:none;">只读查看模式</span>
+    </span>
+    <span>当前模式：<b id="modeLabel">折线画笔</b></span>
+  </div>
+
+  <!-- 医生反馈展示区 -->
+  <div class="feedback-box" id="feedbackBox">
+    <h3>👨‍⚕️ 医生反馈</h3>
+    <div class="row"><span class="label">医生姓名</span><span class="value" id="fbDoctor"></span></div>
+    <div class="row"><span class="label">反馈内容</span><span class="value" id="fbFeedback"></span></div>
+    <div class="row"><span class="label">处理建议</span><span class="value" id="fbTreatment"></span></div>
+    <div class="row"><span class="label">复诊日期</span><span class="value" id="fbFollowUp"></span></div>
+    <div class="row"><span class="label">更新时间</span><span class="value" id="fbUpdatedAt"></span></div>
+  </div>
+
+<script>
+(function() {
+  const canvas = document.getElementById('chartCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const padding = { left: 70, right: 130, top: 40, bottom: 60 };
+  const plotW = canvas.width - padding.left - padding.right;
+  const plotH = canvas.height - padding.top - padding.bottom;
+
+  const xMin = 0, xMax = 24;
+  const yMin = 0, yMax = 10;
+  const MIN_X_STEP = 0.05;
+
+  const painLevels = [
+    { min: 0,  max: 1,  label: '无痛',      color: 'rgba(122, 184, 122, 0.22)', textColor: '#3f7a3f', rangeText: '0 分' },
+    { min: 1,  max: 4,  label: '轻度疼痛',  color: 'rgba(230, 220, 120, 0.22)', textColor: '#8a7a1f', rangeText: '1–3 分' },
+    { min: 4,  max: 7,  label: '中度疼痛',  color: 'rgba(230, 190, 90, 0.22)', textColor: '#8a6a1f', rangeText: '4–6 分' },
+    { min: 7,  max: 10, label: '重度疼痛',  color: 'rgba(220, 130, 80, 0.22)', textColor: '#9a5228', rangeText: '7–9 分' },
+    { min: 10, max: 10, label: '剧痛',      color: 'rgba(200, 70, 70, 0.28)',  textColor: '#8a2e2e', rangeText: '10 分' },
+  ];
+
+  function toCanvasX(dataX) { return padding.left + (dataX - xMin) / (xMax - xMin) * plotW; }
+  function toCanvasY(dataY) { return padding.top + plotH - (dataY - yMin) / (yMax - yMin) * plotH; }
+  function toDataX(canvasX) { return xMin + (canvasX - padding.left) / plotW * (xMax - xMin); }
+  function toDataY(canvasY) { return yMin + (padding.top + plotH - canvasY) / plotH * (yMax - yMin); }
+
+  // ---------- 状态 ----------
+  let lockedPoints = [];
+  let userPoints = [];
+  let isReadOnlyMode = false;
+  let currentDoctorFeedback = null;
+
+  let isDrawing = false;
+  let mode = 'pen';
+  const MIN_POINT_DISTANCE_DATA = 0.08;
+  const ERASER_RADIUS = 18;
+
+  let dragIndex = -1;
+  let isDragging = false;
+  const DRAG_HIT_RADIUS = 10;
+
+  function getAllPoints() {
+    return [...lockedPoints, ...userPoints].sort((a, b) => a.x - b.x);
+  }
+
+  // ---------- 只读模式 UI ----------
+  function updateReadOnlyUI() {
+    const penBtn = document.getElementById('btnPen');
+    const eraserBtn = document.getElementById('btnEraser');
+    const hint = document.getElementById('hintText');
+    const badge = document.getElementById('readonlyBadge');
+    const pName = document.getElementById('patientName');
+    const pId = document.getElementById('patientId');
+    const pAge = document.getElementById('patientAge');
+
+    if (isReadOnlyMode) {
+      penBtn.disabled = true;
+      eraserBtn.disabled = true;
+      penBtn.classList.remove('active');
+      eraserBtn.classList.remove('active');
+      canvas.classList.add('readonly');
+      canvas.style.cursor = 'default';
+      hint.innerHTML = '🔒 当前为只读查看模式 · 加载的数据不可修改 · 点击「清空」可重新开始绘制';
+      badge.style.display = 'inline-block';
+      pName.disabled = true;
+      pId.disabled = true;
+      pAge.disabled = true;
+    } else {
+      penBtn.disabled = false;
+      eraserBtn.disabled = false;
+      canvas.classList.remove('readonly');
+      canvas.style.cursor = 'crosshair';
+      hint.innerHTML = '✏️ 拖拽绘制疼痛曲线 · 靠近自己绘制的数据点可拖拽';
+      badge.style.display = 'none';
+      pName.disabled = false;
+      pId.disabled = false;
+      pAge.disabled = false;
+      penBtn.classList.add('active');
+      mode = 'pen';
+    }
+  }
+
+  // ---------- 医生反馈显示 ----------
+  function updateFeedbackUI() {
+    const box = document.getElementById('feedbackBox');
+    if (!currentDoctorFeedback) {
+      box.style.display = 'none';
+      return;
+    }
+    const f = currentDoctorFeedback;
+
+    // 如果反馈内容完全为空，也隐藏
+    const hasContent = (f.doctorName && f.doctorName.trim()) ||
+                       (f.feedback && f.feedback.trim()) ||
+                       (f.treatment && f.treatment.trim()) ||
+                       (f.followUpDate && f.followUpDate.trim());
+    if (!hasContent) {
+      box.style.display = 'none';
+      return;
+    }
+
+    box.style.display = 'block';
+    document.getElementById('fbDoctor').textContent = f.doctorName || '（未填写）';
+    document.getElementById('fbFeedback').textContent = f.feedback || '（未填写）';
+    document.getElementById('fbTreatment').textContent = f.treatment || '（未填写）';
+    document.getElementById('fbFollowUp').textContent = f.followUpDate || '（未填写）';
+    document.getElementById('fbUpdatedAt').textContent = f.updatedAt
+      ? new Date(f.updatedAt).toLocaleString('zh-CN') : '—';
+
+    // 加载后自动滚动到反馈区，让病人一眼看到
+    setTimeout(() => {
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+  }
+
+  // ---------- 底图 ----------
+  function drawBackground() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#fefcf5';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    painLevels.forEach(level => {
+      if (level.max <= level.min) return;
+      const topY = toCanvasY(level.max);
+      const bottomY = toCanvasY(level.min);
+      ctx.fillStyle = level.color;
+      ctx.fillRect(padding.left, topY, plotW, bottomY - topY);
+    });
+    ctx.fillStyle = 'rgba(200, 70, 70, 0.35)';
+    ctx.fillRect(padding.left, padding.top, plotW, 6);
+
+    ctx.strokeStyle = '#e8e2d6';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 12; i++) {
+      const x = toCanvasX(i * 2);
+      ctx.beginPath();
+      ctx.moveTo(x, padding.top);
+      ctx.lineTo(x, padding.top + plotH);
+      ctx.stroke();
+    }
+    for (let i = yMin; i <= yMax; i++) {
+      const y = toCanvasY(i);
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(padding.left + plotW, y);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = 'rgba(160, 140, 110, 0.55)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([5, 5]);
+    [1, 4, 7, 10].forEach(v => {
+      if (v <= yMin || v >= yMax) return;
+      const y = toCanvasY(v);
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(padding.left + plotW, y);
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = '#5a4e3e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, padding.top + plotH);
+    ctx.lineTo(padding.left + plotW, padding.top + plotH);
+    ctx.stroke();
+
+    ctx.fillStyle = '#7a6c5a';
+    ctx.font = '13px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    for (let i = 0; i <= 12; i++) {
+      const hour = i * 2;
+      ctx.fillText(hour + 'h', toCanvasX(hour), padding.top + plotH + 8);
+    }
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (let i = yMin; i <= yMax; i++) {
+      ctx.fillText(i.toString(), padding.left - 10, toCanvasY(i));
+    }
+
+    ctx.font = 'italic 15px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#4a4032';
+    ctx.textAlign = 'center';
+    ctx.fillText('时间 (小时)', padding.left + plotW / 2, canvas.height - 18);
+    ctx.save();
+    ctx.translate(22, padding.top + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('疼痛指数', 0, 0);
+    ctx.restore();
+
+    drawPainLegend();
+  }
+
+  function drawPainLegend() {
+    const legendX = padding.left + plotW + 18;
+    const legendTop = padding.top + 10;
+    const itemH = 52;
+
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.font = 'bold 13px "Segoe UI", sans-serif';
+    ctx.fillStyle = '#4a4032';
+    ctx.fillText('疼痛等级', legendX, legendTop - 8);
+
+    const legendItems = [...painLevels].reverse();
+    legendItems.forEach((level, i) => {
+      const y = legendTop + 18 + i * itemH;
+      ctx.fillStyle = level.color;
+      ctx.strokeStyle = 'rgba(140, 120, 100, 0.4)';
+      ctx.lineWidth = 1;
+      const sw = 22, sh = 18;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(legendX, y - sh / 2, sw, sh, 4);
+      else ctx.rect(legendX, y - sh / 2, sw, sh);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.font = '12px "Segoe UI", sans-serif';
+      ctx.fillStyle = level.textColor;
+      ctx.fillText(level.label, legendX + sw + 8, y - 7);
+
+      ctx.font = '11px "Segoe UI", sans-serif';
+      ctx.fillStyle = '#8a7c6a';
+      ctx.fillText(level.rangeText, legendX + sw + 8, y + 8);
+    });
+  }
+
+  function buildSmoothPath(pts) {
+    const canvasPts = pts.map(p => ({ x: toCanvasX(p.x), y: toCanvasY(p.y) }));
+    const path = new Path2D();
+    path.moveTo(canvasPts[0].x, canvasPts[0].y);
+    const n = canvasPts.length;
+    for (let i = 0; i < n - 1; i++) {
+      const p0 = canvasPts[i - 1] || canvasPts[i];
+      const p1 = canvasPts[i];
+      const p2 = canvasPts[i + 1];
+      const p3 = canvasPts[i + 2] || canvasPts[i + 1];
+      const alpha = 0.5;
+      const c1x = p1.x + (p2.x - p0.x) * alpha / 3;
+      const c1y = p1.y + (p2.y - p0.y) * alpha / 3;
+      const c2x = p2.x - (p3.x - p1.x) * alpha / 3;
+      const c2y = p2.y - (p3.y - p1.y) * alpha / 3;
+      path.bezierCurveTo(c1x, c1y, c2x, c2y, p2.x, p2.y);
+    }
+    return { path, canvasPts };
+  }
+
+  function drawAreaShadow(pts) {
+    if (pts.length < 2) return;
+    const { path, canvasPts } = buildSmoothPath(pts);
+    const fillPath = new Path2D(path);
+    const last = canvasPts[canvasPts.length - 1];
+    const first = canvasPts[0];
+    const baselineY = toCanvasY(yMin);
+    fillPath.lineTo(last.x, baselineY);
+    fillPath.lineTo(first.x, baselineY);
+    fillPath.closePath();
+    const gradient = ctx.createLinearGradient(0, padding.top, 0, baselineY);
+    gradient.addColorStop(0, 'rgba(179, 74, 60, 0.28)');
+    gradient.addColorStop(1, 'rgba(179, 74, 60, 0.04)');
+    ctx.fillStyle = gradient;
+    ctx.fill(fillPath);
+  }
+
+  function drawSmoothCurve(pts) {
+    if (pts.length < 2) return;
+    const { path } = buildSmoothPath(pts);
+    ctx.strokeStyle = '#b34a3c';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.stroke(path);
+  }
+
+  function drawPoints() {
+    const all = getAllPoints();
+    all.forEach(p => {
+      const cx = toCanvasX(p.x);
+      const cy = toCanvasY(p.y);
+      const isLocked = p.locked === true;
+
+      const isActive = (!isLocked && isDragging && dragIndex >= 0 && userPoints[dragIndex] === p);
+      const radius = isActive ? 4.5 : 3.2;
+      const strokeW = isActive ? 2.8 : 2.2;
+
+      if (isActive) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(179, 74, 60, 0.18)';
+        ctx.fill();
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#fefcf5';
+      ctx.fill();
+      ctx.strokeStyle = isLocked ? '#a09486' : '#b34a3c';
+      ctx.lineWidth = strokeW;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 1.3, 0, Math.PI * 2);
+      ctx.fillStyle = isLocked ? '#a09486' : '#b34a3c';
+      ctx.fill();
+    });
+  }
+
+  let eraserPos = null;
+  function drawEraserCursor() {
+    if (mode !== 'eraser' || !eraserPos || isReadOnlyMode) return;
+    ctx.beginPath();
+    ctx.arc(eraserPos.cx, eraserPos.cy, ERASER_RADIUS, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(180, 160, 140, 0.18)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(140, 120, 100, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function render() {
+    drawBackground();
+    const all = getAllPoints();
+    if (all.length >= 2) {
+      drawAreaShadow(all);
+      drawSmoothCurve(all);
+    }
+    drawPoints();
+    drawEraserCursor();
+    updateInfo();
+  }
+
+  function updateInfo() {
+    const total = lockedPoints.length + userPoints.length;
+    document.getElementById('pointCount').textContent = total;
+    const badge = document.getElementById('lockedBadge');
+    if (lockedPoints.length > 0) {
+      badge.style.display = 'inline-block';
+      badge.textContent = `含 ${lockedPoints.length} 个只读`;
+    } else {
+      badge.style.display = 'none';
+    }
+    document.getElementById('modeLabel').textContent =
+      isReadOnlyMode ? '只读查看' : (mode === 'pen' ? '折线画笔' : '橡皮');
+  }
+
+  function getCanvasPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    let clientX, clientY;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  }
+
+  function insidePlot(cx, cy) {
+    return cx >= padding.left && cx <= padding.left + plotW &&
+           cy >= padding.top && cy <= padding.top + plotH;
+  }
+
+  function snapToData(cx, cy) {
+    let dx = toDataX(cx);
+    let dy = toDataY(cy);
+    dx = Math.max(xMin, Math.min(xMax, dx));
+    dy = Math.max(yMin, Math.min(yMax, dy));
+    dx = Math.round(dx * 10) / 10;
+    dy = Math.round(dy * 10) / 10;
+    return { x: dx, y: dy };
+  }
+
+  function findUserPointNear(cx, cy) {
+    let bestIdx = -1;
+    let bestDist = DRAG_HIT_RADIUS;
+    userPoints.forEach((p, i) => {
+      const px = toCanvasX(p.x);
+      const py = toCanvasY(p.y);
+      const d = Math.hypot(px - cx, py - cy);
+      if (d <= bestDist) { bestDist = d; bestIdx = i; }
+    });
+    return bestIdx;
+  }
+
+  // ---------- 画笔 ----------
+  function penStart(cx, cy) {
+    if (isReadOnlyMode) return;
+    if (!insidePlot(cx, cy)) return;
+    isDrawing = true;
+    const pt = snapToData(cx, cy);
+    const all = getAllPoints();
+    if (all.length > 0) {
+      const last = all[all.length - 1];
+      if (pt.x <= last.x) return;
+    }
+    userPoints.push({ x: pt.x, y: pt.y, locked: false });
+    render();
+  }
+
+  function penMove(cx, cy) {
+    if (isReadOnlyMode) return;
+    if (!isDrawing) return;
+    if (!insidePlot(cx, cy)) return;
+    const last = userPoints[userPoints.length - 1];
+    if (!last) return;
+    const candidate = snapToData(cx, cy);
+    if (candidate.x <= last.x + MIN_X_STEP) return;
+    const dx = candidate.x - last.x;
+    const dy = candidate.y - last.y;
+    if (Math.hypot(dx, dy) < MIN_POINT_DISTANCE_DATA) return;
+    userPoints.push({ x: candidate.x, y: candidate.y, locked: false });
+    render();
+  }
+
+  function penEnd() {
+    if (isReadOnlyMode) return;
+    isDrawing = false;
+    render();
+  }
+
+  // ---------- 拖拽 ----------
+  function dragStart(idx) {
+    if (isReadOnlyMode) return;
+    dragIndex = idx;
+    isDragging = true;
+    canvas.style.cursor = 'grabbing';
+  }
+
+  function dragMove(cx, cy) {
+    if (isReadOnlyMode) return;
+    if (!isDragging || dragIndex < 0) return;
+    if (!insidePlot(cx, cy)) return;
+    const p = userPoints[dragIndex];
+    if (!p) return;
+
+    const candidate = snapToData(cx, cy);
+    const all = getAllPoints();
+    const pIndex = all.indexOf(p);
+    const prev = all[pIndex - 1];
+    const next = all[pIndex + 1];
+
+    let newX = candidate.x, newY = candidate.y;
+    if (prev) { const minX = prev.x + MIN_X_STEP; if (newX < minX) newX = minX; }
+    if (next) { const maxX = next.x - MIN_X_STEP; if (newX > maxX) newX = maxX; }
+
+    p.x = newX;
+    p.y = newY;
+    render();
+  }
+
+  function dragEnd() {
+    if (isDragging) {
+      isDragging = false;
+      dragIndex = -1;
+      if (!isReadOnlyMode) {
+        if (mode === 'pen') canvas.style.cursor = 'crosshair';
+        else if (mode === 'eraser') canvas.style.cursor = 'none';
+      }
+      render();
+    }
+  }
+
+  // ---------- 橡皮 ----------
+  function eraseAt(cx, cy) {
+    if (isReadOnlyMode) return;
+    if (!insidePlot(cx, cy)) return;
+    let nearestIdx = -1;
+    let nearestPixelDist = Infinity;
+    userPoints.forEach((p, i) => {
+      const pixelDist = Math.hypot(toCanvasX(p.x) - cx, toCanvasY(p.y) - cy);
+      if (pixelDist <= ERASER_RADIUS && pixelDist < nearestPixelDist) {
+        nearestPixelDist = pixelDist;
+        nearestIdx = i;
+      }
+    });
+    if (nearestIdx !== -1) {
+      userPoints.splice(nearestIdx, 1);
+      render();
+    }
+  }
+
+  // ---------- 事件 ----------
+  function handlePointerDown(e) {
+    e.preventDefault();
+    if (isReadOnlyMode) return;
+    const pos = getCanvasPos(e);
+    const hitIdx = findUserPointNear(pos.x, pos.y);
+    if (hitIdx !== -1 && mode !== 'eraser') { dragStart(hitIdx); return; }
+    if (mode === 'pen') penStart(pos.x, pos.y);
+    else if (mode === 'eraser') eraseAt(pos.x, pos.y);
+  }
+
+  function handlePointerMove(e) {
+    e.preventDefault();
+    if (isReadOnlyMode) return;
+    const pos = getCanvasPos(e);
+    if (isDragging) { dragMove(pos.x, pos.y); return; }
+
+    if (mode !== 'eraser') {
+      const hitIdx = findUserPointNear(pos.x, pos.y);
+      canvas.style.cursor = hitIdx !== -1 ? 'grab' : 'crosshair';
+    }
+
+    if (mode === 'eraser') { eraserPos = { cx: pos.x, cy: pos.y }; render(); return; }
+    if (mode === 'pen' && isDrawing) penMove(pos.x, pos.y);
+  }
+
+  function handlePointerUp(e) {
+    if (e) e.preventDefault();
+    if (isReadOnlyMode) return;
+    if (isDragging) { dragEnd(); return; }
+    if (mode === 'pen' && isDrawing) penEnd();
+  }
+
+  canvas.addEventListener('mousedown', handlePointerDown);
+  canvas.addEventListener('mousemove', handlePointerMove);
+  canvas.addEventListener('mouseup', handlePointerUp);
+  canvas.addEventListener('mouseleave', () => {
+    if (isReadOnlyMode) return;
+    if (isDragging) dragEnd();
+    if (isDrawing) penEnd();
+    if (mode === 'eraser') { eraserPos = null; render(); }
+    canvas.style.cursor = 'crosshair';
+  });
+  canvas.addEventListener('touchstart', handlePointerDown, { passive: false });
+  canvas.addEventListener('touchmove', handlePointerMove, { passive: false });
+  canvas.addEventListener('touchend', handlePointerUp, { passive: false });
+  canvas.addEventListener('touchcancel', handlePointerUp, { passive: false });
+
+  // ---------- 工具栏 ----------
+  document.getElementById('btnPen').addEventListener('click', () => {
+    if (isReadOnlyMode) return;
+    mode = 'pen'; eraserPos = null;
+    setActiveButton('btnPen');
+    canvas.style.cursor = 'crosshair';
+    render();
+  });
+  document.getElementById('btnEraser').addEventListener('click', () => {
+    if (isReadOnlyMode) return;
+    mode = 'eraser';
+    setActiveButton('btnEraser');
+    canvas.style.cursor = 'none';
+    render();
+  });
+  document.getElementById('btnClear').addEventListener('click', () => {
+    lockedPoints = [];
+    userPoints = [];
+    isReadOnlyMode = false;
+    currentDoctorFeedback = null;
+    isDrawing = false; isDragging = false; dragIndex = -1; eraserPos = null;
+    mode = 'pen';
+    setActiveButton('btnPen');
+    updateReadOnlyUI();
+    updateFeedbackUI();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    render();
+  });
+  document.getElementById('btnExport').addEventListener('click', () => {
+    eraserPos = null; render();
+    const link = document.createElement('a');
+    link.download = 'pain-index-chart.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  function setActiveButton(id) {
+    ['btnPen', 'btnEraser'].forEach(bid => {
+      document.getElementById(bid).classList.toggle('active', bid === id);
+    });
+  }
+
+  // ---------- 保存记录 ----------
+  document.getElementById('btnSaveData').addEventListener('click', () => {
+    const patientName = document.getElementById('patientName').value.trim() || '未填写';
+    const patientId = document.getElementById('patientId').value.trim() || '未填写';
+    const patientAge = document.getElementById('patientAge').value.trim();
+
+    const exportData = {
+      version: 5,
+      type: 'pain-record',
+      exportedAt: new Date().toISOString(),
+      patient: {
+        id: patientId,
+        name: patientName,
+        age: patientAge ? Number(patientAge) : null
+      },
+      chart: {
+        title: '疼痛指数随时间变化',
+        xAxis: { label: '时间 (小时)', min: xMin, max: xMax, unit: 'h' },
+        yAxis: { label: '疼痛指数', min: yMin, max: yMax },
+        painLevels: painLevels.map(l => ({ min: l.min, max: l.max, label: l.label, rangeText: l.rangeText }))
+      },
+      points: [
+        ...lockedPoints.map(p => ({ x: p.x, y: p.y, locked: true })),
+        ...userPoints.map(p => ({ x: p.x, y: p.y, locked: false }))
+      ].sort((a, b) => a.x - b.x),
+      doctorFeedback: currentDoctorFeedback || null
+    };
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    link.download = `pain-record-${patientId}-${ts}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ---------- 加载记录（病人版核心：加载医生处理单并展示反馈） ----------
+  document.getElementById('btnLoadData').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+  });
+
+  document.getElementById('fileInput').addEventListener('change', (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = JSON.parse(evt.target.result);
+
+        let raw = [];
+        if (Array.isArray(data.points)) {
+          raw = data.points;
+        } else if (Array.isArray(data.lockedPoints) || Array.isArray(data.userPoints)) {
+          raw = [...(data.lockedPoints || []), ...(data.userPoints || [])];
+        } else {
+          alert('文件格式不正确：未找到数据点。');
+          return;
+        }
+
+        if (raw.length === 0) {
+          alert('文件中没有数据点。');
+          return;
+        }
+
+        // 恢复病人信息
+        if (data.patient) {
+          document.getElementById('patientName').value = data.patient.name || '';
+          document.getElementById('patientId').value = data.patient.id || '';
+          document.getElementById('patientAge').value = data.patient.age || '';
+        }
+
+        // 恢复医生反馈（关键：这里会把医生填写的内容读出来）
+        currentDoctorFeedback = data.doctorFeedback || null;
+
+        const cleaned = raw
+          .filter(p => p && typeof p.x === 'number' && typeof p.y === 'number')
+          .map(p => ({
+            x: Math.max(xMin, Math.min(xMax, Math.round(p.x * 10) / 10)),
+            y: Math.max(yMin, Math.min(yMax, Math.round(p.y * 10) / 10)),
+            locked: true
+          }))
+          .sort((a, b) => a.x - b.x);
+
+        const deduped = [];
+        cleaned.forEach(p => {
+          if (deduped.length === 0) { deduped.push(p); return; }
+          const last = deduped[deduped.length - 1];
+          if (p.x >= last.x + MIN_X_STEP) deduped.push(p);
+        });
+
+        lockedPoints = deduped;
+        userPoints = [];
+        isReadOnlyMode = true;
+
+        isDrawing = false; isDragging = false; dragIndex = -1; eraserPos = null;
+        updateReadOnlyUI();
+        updateFeedbackUI();
+        render();
+        e.target.value = '';
+
+        // 加载完成后给出明确提示
+        if (currentDoctorFeedback) {
+          const hasContent = (currentDoctorFeedback.doctorName && currentDoctorFeedback.doctorName.trim()) ||
+                             (currentDoctorFeedback.feedback && currentDoctorFeedback.feedback.trim()) ||
+                             (currentDoctorFeedback.treatment && currentDoctorFeedback.treatment.trim()) ||
+                             (currentDoctorFeedback.followUpDate && currentDoctorFeedback.followUpDate.trim());
+          if (hasContent) {
+            alert(`已加载 ${lockedPoints.length} 个数据点。\n\n该记录已包含医生反馈，请查看页面下方医生反馈区域。`);
+          } else {
+            alert(`已加载 ${lockedPoints.length} 个数据点。\n\n当前进入只读查看模式，点击「清空」可重新开始绘制。`);
+          }
+        } else {
+          alert(`已加载 ${lockedPoints.length} 个数据点。\n\n当前进入只读查看模式，点击「清空」可重新开始绘制。`);
+        }
+      } catch (err) {
+        alert('读取文件失败：' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // ---------- 示例数据 ----------
+  userPoints = [
+    { x: 0, y: 0, locked: false },
+    { x: 2, y: 2, locked: false },
+    { x: 4, y: 1.5, locked: false },
+    { x: 6, y: 5, locked: false },
+    { x: 8, y: 8, locked: false },
+    { x: 10, y: 6, locked: false },
+    { x: 12, y: 4, locked: false },
+    { x: 14, y: 3, locked: false },
+    { x: 16, y: 5.5, locked: false },
+    { x: 18, y: 7.5, locked: false },
+    { x: 20, y: 9.5, locked: false },
+    { x: 22, y: 4, locked: false },
+    { x: 24, y: 2, locked: false },
+  ];
+
+  updateReadOnlyUI();
+  updateFeedbackUI();
+  render();
+})();
+</script>
+</body>
+</html>
