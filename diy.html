@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>极客工坊 · 侧边栏DIY装机向导</title>
+    <!-- html2canvas 库：用于生成配置图片 -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fc;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            color: #1e2f3c;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 主应用容器 - 左右分栏布局 */
+        .app-layout {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+            background: #f0f4f9;
+        }
+
+        /* ========= 左侧垂直步骤导航 ========= */
+        .steps-sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafd 100%);
+            border-right: 1px solid #e2edf2;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.02);
+            z-index: 2;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid #eef2f8;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #2c7da0, #1a4d6b);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.75rem;
+            color: #6c8da3;
+            margin-top: 6px;
+        }
+
+        .step-list {
+            flex: 1;
+            padding: 1.5rem 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 0.9rem 1.2rem;
+            margin: 0 0.8rem;
+            border-radius: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: #5a7b93;
+        }
+
+        .step-item:hover {
+            background: #eef3fc;
+        }
+
+        .step-item.active {
+            background: #2c7da0;
+            color: white;
+            box-shadow: 0 8px 16px -8px rgba(44,125,160,0.3);
+        }
+
+        .step-item.completed {
+            color: #2c7da0;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: #eef2f8;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .step-item.active .step-number {
+            background: rgba(255,255,255,0.25);
+            color: white;
+        }
+
+        .step-item.completed .step-number {
+            background: #c8e2f0;
+            color: #1f6390;
+        }
+
+        .step-info {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .sidebar-footer {
+            padding: 1.2rem;
+            border-top: 1px solid #eef2f8;
+            font-size: 0.7rem;
+            color: #7c9bb0;
+            text-align: center;
+        }
+
+        /* ========= 右侧主内容区 ========= */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem 2rem 2rem 2rem;
+            background: #f0f4f9;
+        }
+
+        /* 内容卡片容器 */
+        .content-card {
+            background: white;
+            border-radius: 1.8rem;
+            box-shadow: 0 15px 35px -12px rgba(0, 0, 0, 0.08);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #eef3f8;
+        }
+
+        /* 分类头部 */
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid #2c7da0;
+            padding-left: 1rem;
+        }
+
+        .category-header i {
+            font-size: 1.8rem;
+            color: #2c7da0;
+        }
+
+        .category-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e4a6b;
+        }
+
+        .category-desc {
+            color: #6a8aa3;
+            margin-bottom: 1.8rem;
+            font-size: 0.85rem;
+            background: #f8fbfe;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            display: inline-block;
+        }
+
+        /* 选项网格 */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-card {
+            background: #ffffff;
+            border-radius: 1.2rem;
+            padding: 1rem 1.2rem;
+            cursor: pointer;
+            border: 1px solid #e2edf2;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .option-card:hover {
+            transform: translateY(-3px);
+            border-color: #9bc2d6;
+            box-shadow: 0 12px 20px -12px rgba(44,125,160,0.2);
+        }
+
+        .option-card.selected {
+            border: 2px solid #2c7da0;
+            background: #f0f9ff;
+            box-shadow: 0 8px 18px rgba(44,125,160,0.12);
+        }
+
+        .option-name {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .option-price {
+            color: #c2410c;
+            font-weight: 700;
+            background: #fff0e6;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+        }
+
+        .option-specs {
+            font-size: 0.7rem;
+            color: #5c7f96;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .badge-tdp {
+            background: #eef2fa;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        /* 总览卡片样式 */
+        .summary-card {
+            background: #fefefe;
+            border-radius: 1.2rem;
+            padding: 0.2rem 0;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 1rem 0;
+            border-bottom: 1px solid #ecf3f8;
+        }
+
+        .edit-icon {
+            color: #2c7da0;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: 12px;
+            opacity: 0.7;
+            transition: 0.2s;
+        }
+
+        .edit-icon:hover {
+            opacity: 1;
+        }
+
+        .total-price-summary {
+            background: #eef3f8;
+            border-radius: 1rem;
+            padding: 1rem;
+            font-weight: 800;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+        }
+
+        .compat-alert {
+            background: #fff8eb;
+            border-left: 5px solid #e67e22;
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            font-size: 0.8rem;
+            margin: 1rem 0;
+            color: #a5530b;
+        }
+
+        /* 按钮组 */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.7rem 1.6rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn-primary {
+            background: #2c7da0;
+            color: white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary:hover {
+            background: #1f5e8c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #eef2f8;
+            color: #2c5a74;
+        }
+
+        .btn-secondary:hover {
+            background: #e2eaf0;
+        }
+
+        .btn-saveimg {
+            background: #8b5cf6;
+            color: white;
+        }
+
+        .btn-saveimg:hover {
+            background: #7c3aed;
+        }
+
+        /* 响应式: 小屏幕侧边栏变成顶部导航 */
+        @media (max-width: 780px) {
+            .app-layout {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+            .steps-sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+                border-right: none;
+                border-bottom: 1px solid #e2edf2;
+                padding: 0.5rem 1rem;
+            }
+            .sidebar-header {
+                display: none;
+            }
+            .step-list {
+                flex-direction: row;
+                padding: 0.5rem;
+                gap: 0.5rem;
+                overflow-x: auto;
+            }
+            .step-item {
+                flex-shrink: 0;
+                padding: 0.5rem 1rem;
+                margin: 0;
+            }
+            .step-number {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+            .sidebar-footer {
+                display: none;
+            }
+            .main-content {
+                padding: 1rem;
+            }
+            .content-card {
+                padding: 1.2rem;
+            }
+        }
+
+        /* 滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2edf2;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b9d0de;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="app-layout">
+            <!-- 左侧垂直步骤导航 -->
+            <div class="steps-sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-microchip"></i> 极客装机</h2>
+                    <p>分步选配 · 精准兼容</p>
+                </div>
+                <div class="step-list">
+                    <div v-for="(stepName, idx) in stepNames" :key="idx"
+                         class="step-item"
+                         :class="{ active: currentStep === idx, completed: currentStep > idx }"
+                         @click="currentStep = idx">
+                        <div class="step-number">{{ idx+1 }}</div>
+                        <div class="step-info">{{ stepName }}</div>
+                    </div>
+                </div>
+                <div class="sidebar-footer">
+                    <i class="fas fa-camera"></i> 终页可导出配置图
+                </div>
+            </div>
+
+            <!-- 右侧主内容区 -->
+            <div class="main-content">
+                <div class="content-card">
+                    <!-- 硬件选择步骤 -->
+                    <div v-if="currentStep < totalSteps">
+                        <div class="category-header">
+                            <i :class="'fas ' + currentCategoryData.icon"></i>
+                            <h2>{{ currentCategoryData.name }}</h2>
+                        </div>
+                        <div class="category-desc">
+                            <i class="fas fa-mouse-pointer"></i> 点击下方硬件卡片，选择你的 {{ currentCategoryData.name }}
+                        </div>
+                        <div class="options-grid">
+                            <div v-for="opt in currentCategoryData.options" :key="opt.id"
+                                 class="option-card"
+                                 :class="{ selected: isSelected(opt) }"
+                                 @click="selectComponent(currentCategory, opt)">
+                                <div class="option-name">
+                                    <span>{{ opt.name }}</span>
+                                    <span class="option-price">¥{{ opt.price }}</span>
+                                </div>
+                                <div class="option-specs">
+                                    <span v-if="opt.tdp !== undefined && currentCategory !== 'psu'" class="badge-tdp">
+                                        <i class="fas fa-bolt"></i> {{ opt.tdp }}W
+                                    </span>
+                                    <span v-if="opt.socket"><i class="fas fa-plug"></i> {{ opt.socket }}</span>
+                                    <span v-if="opt.memoryType"><i class="fas fa-database"></i> {{ opt.memoryType }}</span>
+                                    <span v-if="opt.wattage"><i class="fas fa-charging-station"></i> {{ opt.wattage }}W</span>
+                                    <span v-if="opt.info"><i class="fas fa-info-circle"></i> {{ opt.info }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 总览步骤 -->
+                    <div v-else>
+                        <div class="category-header">
+                            <i class="fas fa-clipboard-list"></i>
+                            <h2>配置总览 & 性能报告</h2>
+                        </div>
+                        <div class="summary-card" ref="summaryCard">
+                            <div v-for="cat in categorySteps" :key="cat" class="summary-item">
+                                <div>
+                                    <strong><i :class="'fas ' + (COMPONENTS_DB[cat]?.icon || 'fa-cog')"></i> {{ COMPONENTS_DB[cat]?.name || cat }}</strong>：
+                                    {{ selectedComponents[cat]?.name || '未选择' }}
+                                    <span class="edit-icon" @click="goToStep(cat)"><i class="fas fa-pen"></i> 编辑</span>
+                                </div>
+                                <span style="font-weight:600;">¥{{ selectedComponents[cat]?.price || 0 }}</span>
+                            </div>
+                            <div class="total-price-summary">
+                                <span><i class="fas fa-dollar-sign"></i> 整机造价</span>
+                                <span>¥{{ totalPrice.toLocaleString() }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; font-size:0.85rem; margin: 0.5rem 0 1rem 0;">
+                                <span><i class="fas fa-bolt"></i> 预估满载功耗: {{ totalPower }} W</span>
+                                <span><i class="fas fa-plug"></i> 电源功率: {{ psuWatt }} W</span>
+                            </div>
+                            <div v-if="compatibilityWarnings.length" class="compat-alert">
+                                <i class="fas fa-exclamation-triangle"></i> <strong>兼容性提醒</strong><br>
+                                <span v-html="compatibilityWarnings.join('<br>')"></span>
+                            </div>
+                            <div v-else class="compat-alert" style="background:#eafaf1; border-left-color:#2c7da0; color:#1f5e4c;">
+                                <i class="fas fa-check-circle"></i> 配置完美兼容！可放心装机
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; justify-content: center;">
+                                <button class="btn btn-secondary" @click="resetAll"><i class="fas fa-redo-alt"></i> 全部重置</button>
+                                <button class="btn btn-saveimg" @click="saveConfigAsImage"><i class="fas fa-camera"></i> 保存配置图为图片</button>
+                                <button class="btn btn-primary" @click="currentStep = 0"><i class="fas fa-edit"></i> 返回修改配件</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部导航按钮（硬件步骤时显示） -->
+                    <div class="nav-buttons" v-if="currentStep < totalSteps">
+                        <button v-if="currentStep > 0" class="btn btn-secondary" @click="prevStep">
+                            <i class="fas fa-arrow-left"></i> 上一步
+                        </button>
+                        <div v-else></div>
+                        <button class="btn btn-primary" @click="nextStep">
+                            {{ currentStep === totalSteps - 1 ? '完成装机' : '下一步' }} 
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                    <div class="nav-buttons" v-else style="justify-content: center;">
+                        <button class="btn btn-secondary" @click="currentStep = 0"><i class="fas fa-home"></i> 重新开始</button>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 1rem; font-size: 0.7rem; color: #7c9bb0;">
+                    <i class="fas fa-gem"></i> 点击左侧步骤快速跳转 | 终页可导出高清配置图
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        // ---------- 硬件数据库 ----------
+        const COMPONENTS_DB = {
+            cpu: {
+                name: "中央处理器 CPU",
+                icon: "fa-microchip",
+                options: [
+                    { id: "cpu_intel_i5", name: "Intel Core i5-13400", price: 1450, socket: "LGA1700", tdp: 65, info: "10核16线程" },
+                    { id: "cpu_amd_7600", name: "AMD Ryzen 5 7600", price: 1399, socket: "AM5", tdp: 65, info: "6核12线程" },
+                    { id: "cpu_intel_i7", name: "Intel Core i7-13700K", price: 2699, socket: "LGA1700", tdp: 125, info: "16核24线程" },
+                    { id: "cpu_amd_7800x3d", name: "AMD Ryzen 7 7800X3D", price: 2999, socket: "AM5", tdp: 120, info: "8核16线程 3D缓存" }
+                ]
+            },
+            cooler: {
+                name: "CPU 散热器",
+                icon: "fa-fan",
+                options: [
+                    { id: "cooler_air", name: "风冷散热器 (百元级)", price: 189, tdp: 0, info: "4热管" },
+                    { id: "cooler_tower", name: "双塔风冷", price: 299, tdp: 0, info: "散热性能强劲" },
+                    { id: "cooler_240", name: "240mm 一体水冷", price: 489, tdp: 0, info: "ARGB" }
+                ]
+            },
+            motherboard: {
+                name: "主板",
+                icon: "fa-microchip",
+                options: [
+                    { id: "mb_b760_ddr4", name: "B760M (LGA1700/DDR4)", price: 699, socket: "LGA1700", supportedMemory: ["DDR4"], form: "mATX" },
+                    { id: "mb_b760_ddr5", name: "B760M (LGA1700/DDR5)", price: 799, socket: "LGA1700", supportedMemory: ["DDR5"], form: "mATX" },
+                    { id: "mb_b650_ddr5", name: "B650M (AM5/DDR5)", price: 899, socket: "AM5", supportedMemory: ["DDR5"], form: "mATX" },
+                    { id: "mb_z790_ddr5", name: "Z790 (LGA1700/DDR5)", price: 1599, socket: "LGA1700", supportedMemory: ["DDR5"], form: "ATX" }
+                ]
+            },
+            ram: {
+                name: "内存",
+                icon: "fa-memory",
+                options: [
+                    { id: "ddr4_16g", name: "DDR4 3200 16GB (8Gx2)", price: 399, memoryType: "DDR4", tdp: 5 },
+                    { id: "ddr5_16g", name: "DDR5 5200 16GB (8Gx2)", price: 549, memoryType: "DDR5", tdp: 5 },
+                    { id: "ddr5_32g", name: "DDR5 6000 32GB (16Gx2)", price: 999, memoryType: "DDR5", tdp: 8 }
+                ]
+            },
+            gpu: {
+                name: "显卡",
+                icon: "fa-tv",
+                options: [
+                    { id: "rtx4060", name: "RTX 4060 8GB", price: 2399, tdp: 115, info: "DLSS3" },
+                    { id: "rx6700xt", name: "RX 6700XT 12GB", price: 2699, tdp: 230, info: "2K游戏" },
+                    { id: "rtx4070", name: "RTX 4070 12GB", price: 4399, tdp: 200, info: "高性能光追" }
+                ]
+            },
+            storage: {
+                name: "固态硬盘",
+                icon: "fa-hdd",
+                options: [
+                    { id: "ssd_1t", name: "NVMe 1TB PCIe 3.0", price: 429, tdp: 4 },
+                    { id: "ssd_2t", name: "NVMe 2TB PCIe 4.0", price: 799, tdp: 5 },
+                    { id: "ssd_4t", name: "高性能 4TB (PCIe4.0)", price: 1499, tdp: 6 }
+                ]
+            },
+            psu: {
+                name: "电源供应器",
+                icon: "fa-plug",
+                options: [
+                    { id: "psu_550w", name: "额定550W 铜牌", price: 329, wattage: 550 },
+                    { id: "psu_650w", name: "额定650W 金牌", price: 499, wattage: 650 },
+                    { id: "psu_750w", name: "额定750W 金牌全模组", price: 699, wattage: 750 },
+                    { id: "psu_850w", name: "额定850W 白金", price: 999, wattage: 850 }
+                ]
+            },
+            case: {
+                name: "机箱",
+                icon: "fa-desktop",
+                options: [
+                    { id: "case_mid", name: "中塔侧透机箱", price: 249, info: "ATX/mATX" },
+                    { id: "case_full", name: "全塔电竞机箱", price: 399, info: "支持E-ATX" },
+                    { id: "case_compact", name: "紧凑型mATX机箱", price: 199, info: "迷你精致" }
+                ]
+            }
+        };
+
+        const categorySteps = ["cpu", "cooler", "motherboard", "ram", "gpu", "storage", "psu", "case"];
+        const stepNames = ["CPU", "散热器", "主板", "内存", "显卡", "硬盘", "电源", "机箱", "总览"];
+        const totalSteps = 8;
+
+        function initDefaultSelections() {
+            const defaults = {};
+            for (let cat of categorySteps) {
+                const opts = COMPONENTS_DB[cat]?.options;
+                if (opts && opts.length) defaults[cat] = { ...opts[0] };
+            }
+            return defaults;
+        }
+
+        createApp({
+            setup() {
+                const currentStep = ref(0);
+                const selectedComponents = ref(initDefaultSelections());
+                const summaryCard = ref(null);
+
+                const currentCategory = computed(() => categorySteps[currentStep.value]);
+                const currentCategoryData = computed(() => COMPONENTS_DB[currentCategory.value]);
+
+                const totalPrice = computed(() => {
+                    let total = 0;
+                    for (let cat of categorySteps) {
+                        if (selectedComponents.value[cat]?.price) total += selectedComponents.value[cat].price;
+                    }
+                    return total;
+                });
+
+                const totalPower = computed(() => {
+                    let tdp = 40;
+                    const cpu = selectedComponents.value.cpu;
+                    const gpu = selectedComponents.value.gpu;
+                    const ram = selectedComponents.value.ram;
+                    const storage = selectedComponents.value.storage;
+                    if (cpu?.tdp) tdp += cpu.tdp;
+                    if (gpu?.tdp) tdp += gpu.tdp;
+                    if (ram?.tdp) tdp += ram.tdp;
+                    if (storage?.tdp) tdp += storage.tdp;
+                    tdp += 8;
+                    return tdp;
+                });
+
+                const psuWatt = computed(() => {
+                    const psu = selectedComponents.value.psu;
+                    return psu?.wattage || 0;
+                });
+
+                const compatibilityWarnings = computed(() => {
+                    const warnings = [];
+                    const cpu = selectedComponents.value.cpu;
+                    const mb = selectedComponents.value.motherboard;
+                    const ram = selectedComponents.value.ram;
+                    const psu = selectedComponents.value.psu;
+                    const totalTDP = totalPower.value;
+                    if (cpu && mb && cpu.socket && mb.socket && cpu.socket !== mb.socket) {
+                        warnings.push(`❌ CPU插槽 (${cpu.socket}) 与主板插槽 (${mb.socket}) 不匹配！无法安装。`);
+                    }
+                    if (ram && mb && ram.memoryType && mb.supportedMemory && !mb.supportedMemory.includes(ram.memoryType)) {
+                        warnings.push(`⚠️ 内存类型 ${ram.memoryType} 不被主板支持，主板仅支持 ${mb.supportedMemory.join('/')}`);
+                    }
+                    if (psu && psu.wattage) {
+                        const required = totalTDP + 70;
+                        if (psu.wattage < required) warnings.push(`⚡ 电源功率不足！整机预估 ${totalTDP}W，建议 ≥${required}W，当前电源 ${psu.wattage}W。`);
+                        else if (psu.wattage < totalTDP + 100) warnings.push(`💡 电源余量偏小 (${psu.wattage}W)，建议预留100W以上。`);
+                    } else if (!psu) warnings.push("🔌 未选择电源，无法保证供电稳定。");
+                    const gpu = selectedComponents.value.gpu;
+                    const caseObj = selectedComponents.value.case;
+                    if (gpu && caseObj && caseObj.name.includes("紧凑型") && (gpu.name.includes("4070") || gpu.name.includes("6700"))) {
+                        warnings.push("📏 紧凑型机箱可能不兼容长显卡，建议核对尺寸。");
+                    }
+                    return warnings;
+                });
+
+                const isSelected = (opt) => {
+                    const current = selectedComponents.value[currentCategory.value];
+                    return current && current.id === opt.id;
+                };
+
+                const selectComponent = (category, option) => {
+                    selectedComponents.value = {
+                        ...selectedComponents.value,
+                        [category]: { ...option }
+                    };
+                };
+
+                const goToStep = (category) => {
+                    const idx = categorySteps.indexOf(category);
+                    if (idx !== -1) currentStep.value = idx;
+                };
+
+                const nextStep = () => {
+                    if (currentStep.value < totalSteps) {
+                        if (!selectedComponents.value[currentCategory.value]) {
+                            const firstOpt = COMPONENTS_DB[currentCategory.value]?.options[0];
+                            if (firstOpt) selectComponent(currentCategory.value, firstOpt);
+                        }
+                        currentStep.value++;
+                    }
+                };
+
+                const prevStep = () => {
+                    if (currentStep.value > 0) currentStep.value--;
+                };
+
+                const resetAll = () => {
+                    selectedComponents.value = initDefaultSelections();
+                    currentStep.value = 0;
+                };
+
+                const saveConfigAsImage = async () => {
+                    if (!summaryCard.value) {
+                        alert("请确保在总览页面再导出图片");
+                        return;
+                    }
+                    const originalOverflow = summaryCard.value.style.overflow;
+                    summaryCard.value.style.overflow = 'visible';
+                    try {
+                        const canvas = await html2canvas(summaryCard.value, {
+                            scale: 2.5,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            useCORS: false
+                        });
+                        const link = document.createElement('a');
+                        const timestamp = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+                        link.download = `PC配置单_${timestamp}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    } catch (err) {
+                        console.error(err);
+                        alert("生成图片失败，请重试。");
+                    } finally {
+                        summaryCard.value.style.overflow = originalOverflow;
+                    }
+                };
+
+                return {
+                    currentStep,
+                    selectedComponents,
+                    summaryCard,
+                    categorySteps,
+                    stepNames,
+                    totalSteps,
+                    currentCategory,
+                    currentCategoryData,
+                    totalPrice,
+                    totalPower,
+                    psuWatt,
+                    compatibilityWarnings,
+                    COMPONENTS_DB,
+                    isSelected,
+                    selectComponent,
+                    goToStep,
+                    nextStep,
+                    prevStep,
+                    resetAll,
+                    saveConfigAsImage
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
