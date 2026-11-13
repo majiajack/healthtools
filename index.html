@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导航页 · 健康与DIY</title>
+  <style>
+    /* 全局重置与字体 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: linear-gradient(145deg, #f7f9fc 0%, #e9eef4 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* 主面板 – 柔光卡片容器 */
+    .nav-container {
+      max-width: 1100px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 3.5rem;
+      padding: 2.5rem 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+      transition: all 0.2s;
+    }
+
+    /* 标题区域 */
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1e2b3c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .page-header h1 span {
+      background: linear-gradient(135deg, #2d4b6e, #1e3a5f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+    }
+
+    .page-header .sub {
+      font-size: 1.2rem;
+      color: #4e627c;
+      margin-top: 0.5rem;
+      font-weight: 400;
+      border-bottom: 2px dashed #b7c9dd;
+      display: inline-block;
+      padding-bottom: 0.5rem;
+    }
+
+    /* 导航卡片网格 */
+    .nav-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      margin-top: 1rem;
+    }
+
+    /* 每个模块卡片 */
+    .nav-card {
+      background: #ffffff;
+      border-radius: 2.5rem;
+      padding: 2rem 1.5rem 2rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.3s, background 0.2s;
+      box-shadow: 0 15px 30px -10px rgba(0, 20, 40, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    /* 卡片装饰边框发光 */
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #6aa6d6, #3c7fb1, #1f5e8e);
+      opacity: 0.7;
+      transition: height 0.25s;
+    }
+
+    .nav-card:hover {
+      transform: translateY(-12px);
+      box-shadow: 0 30px 45px -12px rgba(0, 30, 60, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+    }
+
+    .nav-card:hover::before {
+      height: 8px;
+    }
+
+    /* 图标区域 */
+    .card-icon {
+      font-size: 4.5rem;
+      line-height: 1;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 110px;
+      height: 110px;
+      background: #f0f6fe;
+      border-radius: 50%;
+      transition: background 0.3s, transform 0.3s;
+      box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-card:hover .card-icon {
+      background: #e3eefb;
+      transform: scale(1.03);
+    }
+
+    /* 标题和描述 */
+    .card-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+      color: #1e2f40;
+    }
+
+    .card-desc {
+      font-size: 1rem;
+      color: #4a607a;
+      line-height: 1.5;
+      max-width: 250px;
+      margin-bottom: 1.5rem;
+    }
+
+    /* 微妙的“按钮”提示 */
+    .card-link {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #1e5c8b;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.6rem;
+      background: #eef4fc;
+      border-radius: 40px;
+      transition: background 0.25s, color 0.2s, gap 0.2s;
+      margin-top: auto;
+    }
+
+    .nav-card:hover .card-link {
+      background: #1e5c8b;
+      color: white;
+      gap: 0.8rem;
+    }
+
+    /* 单独微调每种卡片的主色（增加细微区别） */
+    .nav-card.health::before {
+      background: linear-gradient(90deg, #3aa981, #228e6b, #0e7354);
+    }
+
+    .nav-card.diy::before {
+      background: linear-gradient(90deg, #b86b3c, #9e512a, #7f3e1c);
+    }
+
+    .nav-card.health .card-link {
+      color: #0e7354;
+      background: #e1f3ec;
+    }
+
+    .nav-card.health:hover .card-link {
+      background: #0e7354;
+      color: white;
+    }
+
+    .nav-card.diy .card-link {
+      color: #9e512a;
+      background: #fbebdf;
+    }
+
+    .nav-card.diy:hover .card-link {
+      background: #9e512a;
+      color: white;
+    }
+
+    /* 移动端适配 */
+    @media (max-width: 650px) {
+      .nav-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .nav-container {
+        padding: 1.75rem 1.25rem;
+        border-radius: 2.5rem;
+      }
+
+      .page-header h1 {
+        font-size: 2rem;
+      }
+
+      .card-icon {
+        font-size: 3.5rem;
+        width: 90px;
+        height: 90px;
+      }
+
+      .card-title {
+        font-size: 1.75rem;
+      }
+    }
+
+    /* 无障碍焦点 */
+    .nav-card:focus-visible {
+      outline: 3px solid #1e5c8b;
+      outline-offset: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-container">
+    <div class="page-header">
+      <h1>
+        <span>📌 导航页</span>
+      </h1>
+      <div class="sub">选择你的模块</div>
+    </div>
+
+    <div class="nav-grid">
+      <!-- 健康模块 · health.html -->
+      <a href="health.html" class="nav-card health">
+        <div class="card-icon">🌿</div>
+        <div class="card-title">健康</div>
+        <div class="card-desc">追踪身体状态，获取健康建议，拥抱活力生活</div>
+        <div class="card-link">
+          进入 health.html
+          <span style="font-size: 1.2rem;">→</span>
+        </div>
+      </a>
+
+      <!-- DIY模块 · diy.html -->
+      <a href="diy.html" class="nav-card diy">
+        <div class="card-icon">🛠️</div>
+        <div class="card-title">DIY</div>
+        <div class="card-desc">创意手工、改造与制作，动手创造专属乐趣</div>
+        <div class="card-link">
+          进入 diy.html
+          <span style="font-size: 1.2rem;">→</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- 底部小提示 (可选) -->
+    <div style="text-align: center; margin-top: 2.5rem; color: #7388a2; font-size: 0.9rem; opacity: 0.8;">
+      ⚡ 点击卡片打开对应页面
+    </div>
+  </div>
+</body>
+</html>
