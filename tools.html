@@ -15,101 +15,199 @@
             font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
             padding: 20px;
         }
-        .container {
-            max-width: 1400px;
+        .app-wrapper {
+            display: flex;
+            max-width: 1500px;
             width: 100%;
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 40px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.7);
-            padding: 30px 30px 35px;
+            overflow: hidden;
+            min-height: calc(100vh - 40px);
         }
-        h1 {
-            font-size: 2.2rem;
+        /* ========== 左侧边栏 ========== */
+        .sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.85);
+            border-right: 1px solid rgba(43, 108, 158, 0.1);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 0;
+        }
+        .sidebar-header {
+            padding: 0 24px 24px;
+            border-bottom: 1px solid rgba(43, 108, 158, 0.08);
+            margin-bottom: 16px;
+        }
+        .sidebar-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1e2b3c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: -0.02em;
+        }
+        .sidebar-header h1 span {
+            background: #2b6c9e;
+            color: white;
+            font-size: 0.65rem;
+            padding: 3px 10px;
+            border-radius: 100px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .sidebar-header .sub {
+            font-size: 0.75rem;
+            color: #7a8fa3;
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 0 12px;
+            flex: 1;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #3e5a73;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+        .nav-item:hover {
+            background: #eef6fd;
+            color: #1e5a8a;
+        }
+        .nav-item.active {
+            background: #1e5a8a;
+            color: white;
+            box-shadow: 0 6px 16px -6px rgba(30, 90, 138, 0.4);
+        }
+        .nav-item .nav-icon {
+            font-size: 1.3rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .nav-item .nav-label {
+            flex: 1;
+        }
+        .nav-item .nav-badge {
+            font-size: 0.6rem;
+            background: rgba(43, 108, 158, 0.15);
+            color: #1e5a8a;
+            padding: 2px 8px;
+            border-radius: 100px;
+            font-weight: 600;
+        }
+        .nav-item.active .nav-badge {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+        }
+        .sidebar-footer {
+            padding: 20px 24px 0;
+            border-top: 1px solid rgba(43, 108, 158, 0.08);
+            margin-top: 16px;
+            font-size: 0.7rem;
+            color: #8da3b9;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        /* ========== 右侧内容区 ========== */
+        .main-content {
+            flex: 1;
+            padding: 30px 35px 35px;
+            overflow-y: auto;
+            max-height: calc(100vh - 40px);
+            scrollbar-width: thin;
+            scrollbar-color: #cbdbe9 transparent;
+        }
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: #cbdbe9;
+            border-radius: 3px;
+        }
+        .panel {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+        .panel.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .panel-header {
+            margin-bottom: 24px;
+        }
+        .panel-header h2 {
+            font-size: 1.8rem;
             font-weight: 600;
             color: #1e2b3c;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
+            gap: 10px;
             letter-spacing: -0.02em;
-            flex-wrap: wrap;
+            margin-bottom: 6px;
         }
-        h1 span {
-            background: #2b6c9e;
-            color: white;
-            font-size: 1rem;
-            padding: 4px 12px;
-            border-radius: 100px;
-            font-weight: 400;
-            letter-spacing: 0;
+        .panel-header p {
+            color: #6a7e91;
+            font-size: 0.95rem;
+            border-left: 3px solid #2b6c9e;
+            padding-left: 12px;
         }
-        .subhead {
-            color: #4a5f73;
-            margin-bottom: 28px;
-            font-size: 1.05rem;
-            border-left: 4px solid #2b6c9e;
-            padding-left: 16px;
-            background: rgba(43, 108, 158, 0.05);
-            border-radius: 0 8px 8px 0;
-            line-height: 1.4;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        @media (max-width: 900px) {
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
-            .container {
-                padding: 24px 18px;
-                border-radius: 28px;
-            }
-            h1 { font-size: 1.8rem; }
-        }
+
+        /* ========== 通用卡片/表单样式 ========== */
         .card {
             background: white;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            border-radius: 24px;
+            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.08);
             padding: 24px;
-            display: flex;
-            flex-direction: column;
-            transition: box-shadow 0.2s;
             border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-        .card:hover {
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(43, 108, 158, 0.15);
+            margin-bottom: 24px;
         }
         .card-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 8px;
         }
-        .card-header h2 {
-            font-size: 1.4rem;
+        .card-header h3 {
+            font-size: 1.25rem;
             font-weight: 600;
             color: #1e2b3c;
             display: flex;
             align-items: center;
             gap: 8px;
         }
-        .card-header h2 i {
-            font-size: 1.6rem;
-            line-height: 1;
-        }
         .badge {
             background: #e6f0f9;
             color: #1e5a8a;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             padding: 4px 10px;
             border-radius: 100px;
@@ -159,7 +257,7 @@
             padding: 12px;
             text-align: center;
             margin-bottom: 16px;
-            min-height: 160px;
+            min-height: 140px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -184,8 +282,8 @@
         textarea {
             width: 100%;
             border: 1px solid #d4e2f0;
-            border-radius: 20px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 14px 16px;
             font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
             font-size: 0.85rem;
             resize: vertical;
@@ -193,7 +291,6 @@
             transition: 0.15s;
             color: #1c3b58;
             line-height: 1.5;
-            height: 180px;
             outline: none;
         }
         textarea:focus {
@@ -210,7 +307,7 @@
         .btn {
             border: none;
             background: white;
-            padding: 12px 20px;
+            padding: 11px 20px;
             border-radius: 100px;
             font-weight: 600;
             font-size: 0.9rem;
@@ -233,7 +330,6 @@
         }
         .btn:active:not(:disabled) {
             transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         .btn-primary {
             background: #1e5a8a;
@@ -249,9 +345,6 @@
             cursor: not-allowed;
             filter: grayscale(0.5);
         }
-        .btn-block {
-            width: 100%;
-        }
         .btn-outline {
             background: transparent;
             border: 1px solid #b8d0e5;
@@ -265,182 +358,6 @@
             color: #1e5a8a;
             display: inline-block;
             width: auto;
-        }
-        .footer-note {
-            text-align: center;
-            margin-top: 28px;
-            color: #7a8fa3;
-            font-size: 0.85rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-            padding-top: 20px;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .copy-icon {
-            font-size: 1rem;
-        }
-
-        /* ---- 哈希卡片 ---- */
-        .hash-panel {
-            margin-top: 32px;
-        }
-        .hash-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        @media (max-width: 900px) {
-            .hash-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .hash-card {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-        .hash-card h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #1e2b3c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 18px;
-        }
-        .hash-input-area {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .hash-input-area textarea {
-            height: 110px;
-        }
-        .hash-result {
-            margin-top: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .hash-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fbfe;
-            border-radius: 16px;
-            padding: 10px 16px;
-            border: 1px solid #deecf7;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .hash-label {
-            font-weight: 600;
-            color: #1e3f5c;
-            font-size: 0.85rem;
-            min-width: 60px;
-        }
-        .hash-value {
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-            font-size: 0.8rem;
-            color: #1c3b58;
-            word-break: break-all;
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            padding: 4px 0;
-        }
-        .hash-value:focus {
-            background: #fff;
-            box-shadow: 0 0 0 2px rgba(43,108,158,0.2);
-            border-radius: 6px;
-            padding: 4px 6px;
-        }
-        .hash-copy-btn {
-            background: transparent;
-            border: 1px solid #cbdbe9;
-            border-radius: 40px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #1e5a8a;
-            cursor: pointer;
-            transition: 0.15s;
-            white-space: nowrap;
-        }
-        .hash-copy-btn:hover {
-            background: #e6f0f9;
-            border-color: #7fa9c7;
-        }
-        .hash-file-area {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-        .file-drop {
-            border: 2px dashed #b8d0e5;
-            border-radius: 20px;
-            background: #f9fcff;
-            padding: 20px 16px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .file-drop:hover {
-            border-color: #2b6c9e;
-            background: #f0f8ff;
-        }
-        .file-drop.drag-over {
-            border-color: #1e4a6e;
-            background: #e1effa;
-        }
-        .file-info {
-            font-size: 0.85rem;
-            color: #4a5f73;
-            margin-top: 6px;
-        }
-        .small-note {
-            font-size: 0.75rem;
-            color: #8da3b9;
-        }
-
-        /* ---- 加解密区域 ---- */
-        .crypto-panel {
-            margin-top: 32px;
-        }
-        .crypto-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        @media (max-width: 900px) {
-            .crypto-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .crypto-card {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-        .crypto-card h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #1e2b3c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
         }
         .crypto-field {
             margin-bottom: 16px;
@@ -490,8 +407,6 @@
             font-family: system-ui, sans-serif;
             letter-spacing: 1px;
         }
-        .mt-2 { margin-top: 8px; }
-        .mt-3 { margin-top: 16px; }
         .inline-badge {
             display: inline-block;
             background: #e6f0f9;
@@ -502,8 +417,95 @@
             border-radius: 40px;
             margin-left: 8px;
         }
-
-        /* ---- AES 高级选项 ---- */
+        .mt-2 { margin-top: 8px; }
+        .mt-3 { margin-top: 16px; }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 1100px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+        .hash-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fbfe;
+            border-radius: 12px;
+            padding: 8px 14px;
+            border: 1px solid #deecf7;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .hash-label {
+            font-weight: 600;
+            color: #1e3f5c;
+            font-size: 0.8rem;
+            min-width: 60px;
+        }
+        .hash-value {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.78rem;
+            color: #1c3b58;
+            word-break: break-all;
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            padding: 4px 0;
+        }
+        .hash-value:focus {
+            background: #fff;
+            box-shadow: 0 0 0 2px rgba(43,108,158,0.2);
+            border-radius: 6px;
+            padding: 4px 6px;
+        }
+        .hash-copy-btn {
+            background: transparent;
+            border: 1px solid #cbdbe9;
+            border-radius: 40px;
+            padding: 3px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e5a8a;
+            cursor: pointer;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+        .hash-copy-btn:hover {
+            background: #e6f0f9;
+            border-color: #7fa9c7;
+        }
+        .file-drop {
+            border: 2px dashed #b8d0e5;
+            border-radius: 20px;
+            background: #f9fcff;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .file-drop:hover {
+            border-color: #2b6c9e;
+            background: #f0f8ff;
+        }
+        .file-drop.drag-over {
+            border-color: #1e4a6e;
+            background: #e1effa;
+        }
+        .file-info {
+            font-size: 0.85rem;
+            color: #4a5f73;
+            margin-top: 6px;
+        }
+        .small-note {
+            font-size: 0.75rem;
+            color: #8da3b9;
+        }
         .aes-advanced-toggle {
             display: flex;
             align-items: center;
@@ -526,7 +528,7 @@
         .aes-advanced-panel {
             background: #f6fafe;
             border: 1px solid #deecf7;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 16px;
             margin-bottom: 16px;
             display: none;
@@ -568,37 +570,6 @@
         .aes-iv-field input {
             font-size: 0.8rem;
             padding: 8px 12px;
-        }
-
-        /* ---- RSA 区域 ---- */
-        .rsa-panel {
-            margin-top: 32px;
-        }
-        .rsa-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-        }
-        @media (max-width: 900px) {
-            .rsa-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        .rsa-card {
-            background: white;
-            border-radius: 28px;
-            box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
-        .rsa-card h2 {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #1e2b3c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 18px;
         }
         .key-textarea {
             height: 130px !important;
@@ -654,291 +625,423 @@
             color: #8da3b9;
             margin-top: 2px;
         }
+
+        /* ========== 移动端适配 ========== */
+        @media (max-width: 900px) {
+            body {
+                padding: 10px;
+            }
+            .app-wrapper {
+                flex-direction: column;
+                border-radius: 28px;
+                min-height: auto;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 20px 0 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(43, 108, 158, 0.1);
+            }
+            .sidebar-header {
+                padding: 0 20px 16px;
+                margin-bottom: 8px;
+            }
+            .sidebar-header h1 {
+                font-size: 1.4rem;
+            }
+            .nav-list {
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 0 12px 12px;
+                gap: 6px;
+                scrollbar-width: thin;
+            }
+            .nav-item {
+                flex-shrink: 0;
+                padding: 10px 14px;
+                font-size: 0.8rem;
+                border-radius: 12px;
+                white-space: nowrap;
+            }
+            .nav-item .nav-icon {
+                font-size: 1.1rem;
+                width: 22px;
+            }
+            .nav-item .nav-badge {
+                display: none;
+            }
+            .sidebar-footer {
+                display: none;
+            }
+            .main-content {
+                padding: 20px 18px;
+                max-height: none;
+                overflow-y: visible;
+            }
+            .panel-header h2 {
+                font-size: 1.5rem;
+            }
+        }
+        @media (max-width: 500px) {
+            .nav-item .nav-label {
+                font-size: 0.75rem;
+            }
+            .main-content {
+                padding: 16px 12px;
+            }
+            .card {
+                padding: 18px;
+                border-radius: 20px;
+            }
+            .grid-2col {
+                gap: 16px;
+            }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>
-        🧰 全能工具箱
-        <span>Base64 · 哈希 · AES/RSA</span>
-    </h1>
-    <div class="subhead">
-        图片转 Base64 · Base64 转图片 · 文本/文件哈希 · AES 对称加解密 · RSA 非对称加解密
-    </div>
+<div class="app-wrapper">
+    <!-- ========== 左侧边栏 ========== -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1>🧰 全能工具箱 <span>v2</span></h1>
+            <div class="sub">Base64 · 哈希 · AES/RSA 加解密<br>全部本地处理，安全无上传</div>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item active" data-panel="panel-image">
+                <span class="nav-icon">🖼️</span>
+                <span class="nav-label">图片 Base64</span>
+                <span class="nav-badge">双向</span>
+            </li>
+            <li class="nav-item" data-panel="panel-hash">
+                <span class="nav-icon">🔐</span>
+                <span class="nav-label">哈希计算</span>
+                <span class="nav-badge">4 种</span>
+            </li>
+            <li class="nav-item" data-panel="panel-aes">
+                <span class="nav-icon">🔒</span>
+                <span class="nav-label">AES 加解密</span>
+                <span class="nav-badge">高级</span>
+            </li>
+            <li class="nav-item" data-panel="panel-rsa">
+                <span class="nav-icon">🔑</span>
+                <span class="nav-label">RSA 加解密</span>
+                <span class="nav-badge">2048+</span>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            ⚡ 所有计算在浏览器本地完成<br>不会上传任何图片、文本或密钥
+        </div>
+    </aside>
 
-    <!-- 图片转换区域 -->
-    <div class="grid">
-        <div class="card">
-            <div class="card-header">
-                <h2><i>🖼️</i> 图片转 Base64</h2>
-                <div class="badge">本地处理</div>
+    <!-- ========== 右侧内容区 ========== -->
+    <main class="main-content">
+        <!-- 面板 1: 图片 Base64 -->
+        <div class="panel active" id="panel-image">
+            <div class="panel-header">
+                <h2>🖼️ 图片 Base64 互转</h2>
+                <p>支持点击、拖拽或粘贴图片，与 Base64 编码双向转换</p>
             </div>
-            <div class="upload-area" id="dropZoneLeft">
-                <input type="file" id="fileInput" accept="image/*">
-                <div class="upload-icon">📤</div>
-                <div class="upload-text">点击、拖拽或粘贴图片</div>
-                <div class="upload-hint">支持 JPG, PNG, GIF, WebP, SVG 等</div>
-            </div>
-            <div class="preview-box" id="leftPreview">
-                <div class="placeholder">
-                    <span>🖼️</span>
-                    <span>图片预览</span>
+            <div class="grid-2col">
+                <!-- 图片转 Base64 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📤 图片转 Base64</h3>
+                        <span class="badge">本地处理</span>
+                    </div>
+                    <div class="upload-area" id="dropZoneLeft">
+                        <input type="file" id="fileInput" accept="image/*">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">点击、拖拽或粘贴图片</div>
+                        <div class="upload-hint">支持 JPG, PNG, GIF, WebP, SVG 等</div>
+                    </div>
+                    <div class="preview-box" id="leftPreview">
+                        <div class="placeholder">
+                            <span>🖼️</span>
+                            <span>图片预览</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
+                        <label style="font-size:0.85rem; color:#2c4b6e; font-weight:500;">Base64 编码</label>
+                        <button class="btn" id="copyLeftBtn" style="padding: 5px 14px; font-size:0.75rem;" disabled>📋 复制</button>
+                    </div>
+                    <textarea id="base64Output" placeholder="Base64 编码将显示在这里…" readonly style="height: 140px;"></textarea>
+                    <div class="button-row">
+                        <button class="btn btn-primary" id="convertToBase64Btn" disabled>⬅️ 转换图片为 Base64</button>
+                        <button class="btn btn-outline" id="clearLeftBtn">清空</button>
+                    </div>
+                    <div id="leftStatus" class="status-message"></div>
+                </div>
+
+                <!-- Base64 转图片 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📥 Base64 转图片</h3>
+                        <span class="badge">实时预览</span>
+                    </div>
+                    <textarea id="base64Input" placeholder="在此粘贴 Base64 字符串（可带 data:image/... 前缀）…" style="height: 160px;"></textarea>
+                    <div class="button-row" style="margin-top: 12px;">
+                        <button class="btn btn-primary" id="convertToImageBtn">🔁 转换为图片</button>
+                        <button class="btn btn-outline" id="clearRightBtn">清空</button>
+                    </div>
+                    <div class="preview-box" id="rightPreview" style="margin-top: 16px; min-height: 160px;">
+                        <div class="placeholder">
+                            <span>🖼️</span>
+                            <span>Base64 图片预览</span>
+                        </div>
+                    </div>
+                    <div id="rightStatus" class="status-message"></div>
                 </div>
             </div>
-            <div style="margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;">
-                <label style="font-size:0.9rem; color:#2c4b6e; font-weight:500;">Base64 编码</label>
-                <button class="btn" id="copyLeftBtn" style="padding: 6px 14px; font-size:0.8rem;" disabled>📋 复制</button>
-            </div>
-            <textarea id="base64Output" placeholder="Base64 编码将显示在这里…" readonly></textarea>
-            <div class="button-row">
-                <button class="btn btn-primary" id="convertToBase64Btn" disabled>⬅️ 转换图片为 Base64</button>
-                <button class="btn btn-outline" id="clearLeftBtn">清空</button>
-            </div>
-            <div id="leftStatus" class="status-message"></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <h2><i>🔁</i> Base64 转图片</h2>
-                <div class="badge">实时预览</div>
+        <!-- 面板 2: 哈希计算 -->
+        <div class="panel" id="panel-hash">
+            <div class="panel-header">
+                <h2>🔐 哈希计算</h2>
+                <p>文本与文件哈希，支持 MD5、SHA-1、SHA-256、SHA-512</p>
             </div>
-            <textarea id="base64Input" placeholder="在此粘贴 Base64 字符串（可带 data:image/... 前缀）…" style="height:180px;"></textarea>
-            <div class="button-row" style="margin-top:12px;">
-                <button class="btn btn-primary" id="convertToImageBtn">🔁 转换为图片</button>
-                <button class="btn btn-outline" id="clearRightBtn">清空</button>
-            </div>
-            <div class="preview-box" id="rightPreview" style="margin-top: 16px; min-height:180px;">
-                <div class="placeholder">
-                    <span>🖼️</span>
-                    <span>Base64 图片预览</span>
-                </div>
-            </div>
-            <div id="rightStatus" class="status-message"></div>
-        </div>
-    </div>
-
-    <!-- 哈希计算区域 -->
-    <div class="hash-panel">
-        <div class="hash-grid">
-            <div class="hash-card">
-                <h2>📝 文本哈希计算</h2>
-                <div class="hash-input-area">
-                    <textarea id="textHashInput" placeholder="输入需要计算哈希的文本…"></textarea>
-                    <div class="button-row" style="margin-top: 0;">
+            <div class="grid-2col">
+                <!-- 文本哈希 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📝 文本哈希</h3>
+                        <span class="badge">实时计算</span>
+                    </div>
+                    <textarea id="textHashInput" placeholder="输入需要计算哈希的文本…" style="height: 100px;"></textarea>
+                    <div class="button-row" style="margin-top: 12px;">
                         <button class="btn btn-primary" id="calcTextHashBtn">🔐 计算哈希</button>
                         <button class="btn btn-outline" id="clearTextHashBtn">清空</button>
                     </div>
+                    <div class="hash-result mt-2" id="textHashResult">
+                        <div class="hash-row"><span class="hash-label">MD5</span><input class="hash-value" id="md5Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="md5Text">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-1</span><input class="hash-value" id="sha1Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha1Text">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-256</span><input class="hash-value" id="sha256Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha256Text">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-512</span><input class="hash-value" id="sha512Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha512Text">复制</button></div>
+                    </div>
+                    <div id="textHashStatus" class="status-message" style="margin-top: 12px;"></div>
                 </div>
-                <div class="hash-result" id="textHashResult">
-                    <div class="hash-row"><span class="hash-label">MD5</span><input class="hash-value" id="md5Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="md5Text">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-1</span><input class="hash-value" id="sha1Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha1Text">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-256</span><input class="hash-value" id="sha256Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha256Text">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-512</span><input class="hash-value" id="sha512Text" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha512Text">复制</button></div>
-                </div>
-                <div id="textHashStatus" class="status-message" style="margin-top: 12px;"></div>
-            </div>
 
-            <div class="hash-card">
-                <h2>📁 文件哈希计算</h2>
-                <div class="hash-file-area">
+                <!-- 文件哈希 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📁 文件哈希</h3>
+                        <span class="badge">支持大文件</span>
+                    </div>
                     <div class="file-drop" id="hashFileDrop">
                         <div style="font-size: 2rem;">📂</div>
                         <div style="font-weight: 500; color: #1e5a8a;">点击或拖拽文件到此处</div>
                         <div class="small-note">支持任意文件，计算 MD5, SHA-1, SHA-256, SHA-512</div>
                     </div>
-                    <div class="file-info" id="fileHashInfo"></div>
+                    <div class="file-info" id="fileHashInfo" style="margin: 8px 0;"></div>
                     <div class="button-row" style="margin-top: 0;">
                         <button class="btn btn-primary" id="calcFileHashBtn" disabled>🔐 计算文件哈希</button>
                         <button class="btn btn-outline" id="clearFileHashBtn">清空</button>
                     </div>
+                    <div class="hash-result mt-2" id="fileHashResult">
+                        <div class="hash-row"><span class="hash-label">MD5</span><input class="hash-value" id="md5File" readonly placeholder="—"><button class="hash-copy-btn" data-target="md5File">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-1</span><input class="hash-value" id="sha1File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha1File">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-256</span><input class="hash-value" id="sha256File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha256File">复制</button></div>
+                        <div class="hash-row"><span class="hash-label">SHA-512</span><input class="hash-value" id="sha512File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha512File">复制</button></div>
+                    </div>
+                    <div id="fileHashStatus" class="status-message" style="margin-top: 12px;"></div>
                 </div>
-                <div class="hash-result" id="fileHashResult">
-                    <div class="hash-row"><span class="hash-label">MD5</span><input class="hash-value" id="md5File" readonly placeholder="—"><button class="hash-copy-btn" data-target="md5File">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-1</span><input class="hash-value" id="sha1File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha1File">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-256</span><input class="hash-value" id="sha256File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha256File">复制</button></div>
-                    <div class="hash-row"><span class="hash-label">SHA-512</span><input class="hash-value" id="sha512File" readonly placeholder="—"><button class="hash-copy-btn" data-target="sha512File">复制</button></div>
-                </div>
-                <div id="fileHashStatus" class="status-message" style="margin-top: 12px;"></div>
             </div>
         </div>
-    </div>
 
-    <!-- AES 加解密区域 (带高级模式) -->
-    <div class="crypto-panel">
-        <div class="crypto-grid">
-            <!-- AES 加密 -->
-            <div class="crypto-card">
-                <h2>🔒 AES 加密 <span class="inline-badge" id="aesEncryptModeBadge">GCM</span></h2>
-                <div class="aes-advanced-toggle">
-                    <input type="checkbox" id="aesAdvancedToggle">
-                    <span>⚙️ 高级模式（自定义运算模式、填充、密钥长度）</span>
+        <!-- 面板 3: AES 加解密 -->
+        <div class="panel" id="panel-aes">
+            <div class="panel-header">
+                <h2>🔒 AES 加解密</h2>
+                <p>支持 GCM/CBC/CTR/ECB 运算模式，PKCS#7/ZeroPadding/NoPadding 填充，128/192/256 位密钥</p>
+            </div>
+            <div class="grid-2col">
+                <!-- AES 加密 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔐 AES 加密</h3>
+                        <span class="inline-badge" id="aesEncryptModeBadge">GCM</span>
+                    </div>
+                    <div class="aes-advanced-toggle">
+                        <input type="checkbox" id="aesAdvancedToggle">
+                        <span>⚙️ 高级模式（自定义运算模式、填充、密钥长度）</span>
+                    </div>
+                    <div class="aes-advanced-panel" id="aesAdvancedPanel">
+                        <div class="aes-options-grid">
+                            <div class="crypto-field">
+                                <label>运算模式</label>
+                                <select id="aesMode">
+                                    <option value="AES-GCM" selected>AES-GCM (推荐)</option>
+                                    <option value="AES-CBC">AES-CBC</option>
+                                    <option value="AES-CTR">AES-CTR</option>
+                                    <option value="AES-ECB">AES-ECB (不安全)</option>
+                                </select>
+                            </div>
+                            <div class="crypto-field">
+                                <label>填充模式</label>
+                                <select id="aesPadding">
+                                    <option value="PKCS7" selected>PKCS#7</option>
+                                    <option value="ZeroPadding">ZeroPadding</option>
+                                    <option value="NoPadding">NoPadding</option>
+                                </select>
+                            </div>
+                            <div class="crypto-field">
+                                <label>密钥长度</label>
+                                <select id="aesKeyLength">
+                                    <option value="128">128 位</option>
+                                    <option value="192">192 位</option>
+                                    <option value="256" selected>256 位</option>
+                                </select>
+                            </div>
+                            <div class="crypto-field">
+                                <label>密钥派生</label>
+                                <select id="aesKdf">
+                                    <option value="PBKDF2" selected>PBKDF2 (密码派生)</option>
+                                    <option value="RawKey">直接密钥 (Hex/Base64)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="crypto-field aes-iv-field" id="aesIvField" style="display:none;">
+                            <label>IV / Nonce (Hex，留空自动生成)</label>
+                            <input type="text" id="aesIvInput" placeholder="例如: 00112233445566778899aabbccddeeff" style="font-family: 'SF Mono', monospace;">
+                        </div>
+                        <div class="aes-hint" id="aesHint">GCM 模式推荐使用 256 位密钥，PBKDF2 派生。CBC/CTR 需要 IV，ECB 不需要 IV 但极不安全。</div>
+                    </div>
+                    <div class="crypto-field">
+                        <label>明文内容</label>
+                        <textarea id="encryptPlaintext" placeholder="输入需要加密的文本…" style="min-height: 90px;"></textarea>
+                    </div>
+                    <div class="crypto-field">
+                        <label>密码 / 密钥</label>
+                        <input type="password" id="encryptPassword" placeholder="输入加密密码…">
+                    </div>
+                    <div class="button-row" style="margin-top: 0;">
+                        <button class="btn btn-primary" id="encryptBtn">🔐 加密</button>
+                        <button class="btn btn-outline" id="clearEncryptBtn">清空</button>
+                    </div>
+                    <div class="crypto-field mt-3">
+                        <label>加密结果 (Base64)</label>
+                        <textarea id="encryptResult" placeholder="加密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
+                        <button class="btn btn-outline" id="copyEncryptBtn" style="margin-top: 8px; padding: 7px 16px; font-size: 0.8rem;">📋 复制加密结果</button>
+                    </div>
+                    <div id="encryptStatus" class="status-message"></div>
                 </div>
-                <div class="aes-advanced-panel" id="aesAdvancedPanel">
-                    <div class="aes-options-grid">
-                        <div class="crypto-field">
-                            <label>运算模式</label>
-                            <select id="aesMode">
-                                <option value="AES-GCM" selected>AES-GCM (推荐)</option>
-                                <option value="AES-CBC">AES-CBC</option>
-                                <option value="AES-CTR">AES-CTR</option>
-                                <option value="AES-ECB">AES-ECB (不安全)</option>
-                            </select>
+
+                <!-- AES 解密 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔓 AES 解密</h3>
+                        <span class="inline-badge" id="aesDecryptModeBadge">GCM</span>
+                    </div>
+                    <div class="crypto-field">
+                        <label>密文 (Base64)</label>
+                        <textarea id="decryptCiphertext" placeholder="粘贴需要解密的 Base64 密文…" style="min-height: 90px;"></textarea>
+                    </div>
+                    <div class="crypto-field">
+                        <label>密码 / 密钥</label>
+                        <input type="password" id="decryptPassword" placeholder="输入解密密码…">
+                    </div>
+                    <div class="button-row" style="margin-top: 0;">
+                        <button class="btn btn-primary" id="decryptBtn">🔓 解密</button>
+                        <button class="btn btn-outline" id="clearDecryptBtn">清空</button>
+                    </div>
+                    <div class="crypto-field mt-3">
+                        <label>解密结果 (明文)</label>
+                        <textarea id="decryptResult" placeholder="解密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
+                        <button class="btn btn-outline" id="copyDecryptBtn" style="margin-top: 8px; padding: 7px 16px; font-size: 0.8rem;">📋 复制解密结果</button>
+                    </div>
+                    <div id="decryptStatus" class="status-message"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 面板 4: RSA 加解密 -->
+        <div class="panel" id="panel-rsa">
+            <div class="panel-header">
+                <h2>🔑 RSA 加解密</h2>
+                <p>RSA-OAEP 非对称加密，支持 2048/3072/4096 位密钥，SPKI/PKCS#8 或 PKCS#1 格式</p>
+            </div>
+            <div class="grid-2col">
+                <!-- RSA 加密 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔐 RSA 加密</h3>
+                        <span class="badge">RSA-OAEP</span>
+                    </div>
+                    <div class="crypto-field">
+                        <label>公钥 (PEM)</label>
+                        <textarea id="rsaPublicKey" class="key-textarea" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
+                        <div class="key-actions">
+                            <button class="btn btn-outline" id="generateRsaKeyPairBtn" style="background:#e6f0f9;">🔑 生成密钥对</button>
+                            <button class="btn btn-outline" id="copyPublicKeyBtn">📋 复制公钥</button>
                         </div>
-                        <div class="crypto-field">
-                            <label>填充模式</label>
-                            <select id="aesPadding">
-                                <option value="PKCS7" selected>PKCS#7</option>
-                                <option value="ZeroPadding">ZeroPadding</option>
-                                <option value="NoPadding">NoPadding</option>
-                            </select>
-                        </div>
+                        <div class="rsa-tip">生成密钥对后，公钥会自动填入上方，私钥在右侧解密区。</div>
+                    </div>
+                    <div class="key-options-row">
                         <div class="crypto-field">
                             <label>密钥长度</label>
-                            <select id="aesKeyLength">
-                                <option value="128">128 位</option>
-                                <option value="192">192 位</option>
-                                <option value="256" selected>256 位</option>
+                            <select id="rsaModulusLength">
+                                <option value="2048" selected>2048 位 (默认)</option>
+                                <option value="3072">3072 位</option>
+                                <option value="4096">4096 位</option>
                             </select>
                         </div>
                         <div class="crypto-field">
-                            <label>密钥派生</label>
-                            <select id="aesKdf">
-                                <option value="PBKDF2" selected>PBKDF2 (密码派生)</option>
-                                <option value="RawKey">直接密钥 (Hex/Base64)</option>
+                            <label>密钥格式</label>
+                            <select id="rsaKeyFormat">
+                                <option value="spki-pkcs8" selected>SPKI / PKCS#8 (通用)</option>
+                                <option value="pkcs1">PKCS#1 (传统)</option>
                             </select>
                         </div>
                     </div>
-                    <div class="crypto-field aes-iv-field" id="aesIvField" style="display:none;">
-                        <label>IV / Nonce (Hex，留空自动生成)</label>
-                        <input type="text" id="aesIvInput" placeholder="例如: 00112233445566778899aabbccddeeff" style="font-family: 'SF Mono', monospace;">
-                    </div>
-                    <div class="aes-hint" id="aesHint">GCM 模式推荐使用 256 位密钥，PBKDF2 派生。CBC/CTR 需要 IV，ECB 不需要 IV 但极不安全。</div>
-                </div>
-                <div class="crypto-field">
-                    <label>明文内容</label>
-                    <textarea id="encryptPlaintext" placeholder="输入需要加密的文本…"></textarea>
-                </div>
-                <div class="crypto-field">
-                    <label>密码 / 密钥</label>
-                    <input type="password" id="encryptPassword" placeholder="输入加密密码…">
-                </div>
-                <div class="button-row" style="margin-top: 0;">
-                    <button class="btn btn-primary" id="encryptBtn">🔐 加密</button>
-                    <button class="btn btn-outline" id="clearEncryptBtn">清空</button>
-                </div>
-                <div class="crypto-field mt-3">
-                    <label>加密结果 (Base64)</label>
-                    <textarea id="encryptResult" placeholder="加密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
-                    <button class="btn btn-outline" id="copyEncryptBtn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;">📋 复制加密结果</button>
-                </div>
-                <div id="encryptStatus" class="status-message"></div>
-            </div>
-
-            <!-- AES 解密 -->
-            <div class="crypto-card">
-                <h2>🔓 AES 解密 <span class="inline-badge" id="aesDecryptModeBadge">GCM</span></h2>
-                <div class="crypto-field">
-                    <label>密文 (Base64)</label>
-                    <textarea id="decryptCiphertext" placeholder="粘贴需要解密的 Base64 密文…"></textarea>
-                </div>
-                <div class="crypto-field">
-                    <label>密码 / 密钥</label>
-                    <input type="password" id="decryptPassword" placeholder="输入解密密码…">
-                </div>
-                <div class="button-row" style="margin-top: 0;">
-                    <button class="btn btn-primary" id="decryptBtn">🔓 解密</button>
-                    <button class="btn btn-outline" id="clearDecryptBtn">清空</button>
-                </div>
-                <div class="crypto-field mt-3">
-                    <label>解密结果 (明文)</label>
-                    <textarea id="decryptResult" placeholder="解密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
-                    <button class="btn btn-outline" id="copyDecryptBtn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;">📋 复制解密结果</button>
-                </div>
-                <div id="decryptStatus" class="status-message"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ========== RSA 加解密区域 ========== -->
-    <div class="rsa-panel">
-        <div class="rsa-grid">
-            <!-- RSA 加密 -->
-            <div class="rsa-card">
-                <h2>🔐 RSA 加密 <span class="inline-badge">RSA-OAEP</span></h2>
-                <div class="crypto-field">
-                    <label>公钥 (PEM)</label>
-                    <textarea id="rsaPublicKey" class="key-textarea" placeholder="-----BEGIN PUBLIC KEY-----&#10;...&#10;-----END PUBLIC KEY-----"></textarea>
-                    <div class="key-actions">
-                        <button class="btn btn-outline" id="generateRsaKeyPairBtn" style="background:#e6f0f9;">🔑 生成密钥对</button>
-                        <button class="btn btn-outline" id="copyPublicKeyBtn">📋 复制公钥</button>
-                    </div>
-                    <div class="rsa-tip">生成密钥对后，公钥会自动填入上方，私钥在右侧解密区。</div>
-                </div>
-                <div class="key-options-row">
+                    <div class="key-format-note" id="rsaFormatNote">SPKI: -----BEGIN PUBLIC KEY-----  |  PKCS#8: -----BEGIN PRIVATE KEY-----</div>
                     <div class="crypto-field">
-                        <label>密钥长度</label>
-                        <select id="rsaModulusLength">
-                            <option value="2048" selected>2048 位 (默认)</option>
-                            <option value="3072">3072 位</option>
-                            <option value="4096">4096 位</option>
-                        </select>
+                        <label>明文内容</label>
+                        <textarea id="rsaPlaintext" placeholder="输入需要加密的文本…" style="min-height: 80px;"></textarea>
+                    </div>
+                    <div class="button-row" style="margin-top: 0;">
+                        <button class="btn btn-primary" id="rsaEncryptBtn">🔐 RSA 加密</button>
+                        <button class="btn btn-outline" id="clearRsaEncryptBtn">清空</button>
+                    </div>
+                    <div class="crypto-field mt-3">
+                        <label>加密结果 (Base64)</label>
+                        <textarea id="rsaCiphertextResult" placeholder="RSA 加密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
+                        <button class="btn btn-outline" id="copyRsaCiphertextBtn" style="margin-top: 8px; padding: 7px 16px; font-size: 0.8rem;">📋 复制密文</button>
+                    </div>
+                    <div id="rsaEncryptStatus" class="rsa-status"></div>
+                </div>
+
+                <!-- RSA 解密 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🔓 RSA 解密</h3>
+                        <span class="badge">RSA-OAEP</span>
                     </div>
                     <div class="crypto-field">
-                        <label>密钥格式</label>
-                        <select id="rsaKeyFormat">
-                            <option value="spki-pkcs8" selected>SPKI / PKCS#8 (通用)</option>
-                            <option value="pkcs1">PKCS#1 (传统)</option>
-                        </select>
+                        <label>私钥 (PEM)</label>
+                        <textarea id="rsaPrivateKey" class="key-textarea" placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"></textarea>
+                        <div class="key-actions">
+                            <button class="btn btn-outline" id="copyPrivateKeyBtn">📋 复制私钥</button>
+                        </div>
                     </div>
-                </div>
-                <div class="key-format-note" id="rsaFormatNote">SPKI: -----BEGIN PUBLIC KEY-----  |  PKCS#8: -----BEGIN PRIVATE KEY-----</div>
-                <div class="crypto-field">
-                    <label>明文内容</label>
-                    <textarea id="rsaPlaintext" placeholder="输入需要加密的文本…" style="min-height: 80px;"></textarea>
-                </div>
-                <div class="button-row" style="margin-top: 0;">
-                    <button class="btn btn-primary" id="rsaEncryptBtn">🔐 RSA 加密</button>
-                    <button class="btn btn-outline" id="clearRsaEncryptBtn">清空</button>
-                </div>
-                <div class="crypto-field mt-3">
-                    <label>加密结果 (Base64)</label>
-                    <textarea id="rsaCiphertextResult" placeholder="RSA 加密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
-                    <button class="btn btn-outline" id="copyRsaCiphertextBtn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;">📋 复制密文</button>
-                </div>
-                <div id="rsaEncryptStatus" class="rsa-status"></div>
-            </div>
-
-            <!-- RSA 解密 -->
-            <div class="rsa-card">
-                <h2>🔓 RSA 解密 <span class="inline-badge">RSA-OAEP</span></h2>
-                <div class="crypto-field">
-                    <label>私钥 (PEM)</label>
-                    <textarea id="rsaPrivateKey" class="key-textarea" placeholder="-----BEGIN PRIVATE KEY-----&#10;...&#10;-----END PRIVATE KEY-----"></textarea>
-                    <div class="key-actions">
-                        <button class="btn btn-outline" id="copyPrivateKeyBtn">📋 复制私钥</button>
+                    <div class="crypto-field">
+                        <label>密文 (Base64)</label>
+                        <textarea id="rsaCiphertextInput" placeholder="粘贴需要解密的 Base64 密文…" style="min-height: 80px;"></textarea>
                     </div>
+                    <div class="button-row" style="margin-top: 0;">
+                        <button class="btn btn-primary" id="rsaDecryptBtn">🔓 RSA 解密</button>
+                        <button class="btn btn-outline" id="clearRsaDecryptBtn">清空</button>
+                    </div>
+                    <div class="crypto-field mt-3">
+                        <label>解密结果 (明文)</label>
+                        <textarea id="rsaPlaintextResult" placeholder="RSA 解密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
+                        <button class="btn btn-outline" id="copyRsaPlaintextBtn" style="margin-top: 8px; padding: 7px 16px; font-size: 0.8rem;">📋 复制明文</button>
+                    </div>
+                    <div id="rsaDecryptStatus" class="rsa-status"></div>
                 </div>
-                <div class="crypto-field">
-                    <label>密文 (Base64)</label>
-                    <textarea id="rsaCiphertextInput" placeholder="粘贴需要解密的 Base64 密文…" style="min-height: 80px;"></textarea>
-                </div>
-                <div class="button-row" style="margin-top: 0;">
-                    <button class="btn btn-primary" id="rsaDecryptBtn">🔓 RSA 解密</button>
-                    <button class="btn btn-outline" id="clearRsaDecryptBtn">清空</button>
-                </div>
-                <div class="crypto-field mt-3">
-                    <label>解密结果 (明文)</label>
-                    <textarea id="rsaPlaintextResult" placeholder="RSA 解密结果将显示在这里…" readonly style="min-height: 80px;"></textarea>
-                    <button class="btn btn-outline" id="copyRsaPlaintextBtn" style="margin-top: 8px; padding: 8px 16px; font-size: 0.8rem;">📋 复制明文</button>
-                </div>
-                <div id="rsaDecryptStatus" class="rsa-status"></div>
             </div>
         </div>
-    </div>
-
-    <div class="footer-note">
-        ⚡ 所有操作均在浏览器本地完成 · 哈希使用 Web Crypto API + blueimp-md5 · AES 支持 GCM/CBC/CTR/ECB + 填充 + 密钥长度 · RSA 使用 RSA-OAEP (可选 2048/3072/4096 位)
-    </div>
+    </main>
 </div>
 
 <!-- 引入 MD5 库 -->
@@ -952,6 +1055,23 @@
             element.style.color = isError ? '#b33a3a' : '#1e5a8a';
             if (!msg) element.style.background = 'transparent';
         }
+
+        // ================= 侧边栏导航 =================
+        const navItems = document.querySelectorAll('.nav-item');
+        const panels = document.querySelectorAll('.panel');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetPanel = item.dataset.panel;
+                // 切换导航激活状态
+                navItems.forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                // 切换面板显示
+                panels.forEach(p => p.classList.remove('active'));
+                const panel = document.getElementById(targetPanel);
+                if (panel) panel.classList.add('active');
+            });
+        });
 
         // ================= 1. 图片互转 =================
         const fileInput = document.getElementById('fileInput');
@@ -1257,67 +1377,36 @@
             }
             return bytes;
         }
-        function uint8ArrayToHex(bytes) {
-            return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
 
-        // 获取 AES 高级配置
         function getAesConfig() {
             const advanced = document.getElementById('aesAdvancedToggle').checked;
             if (!advanced) {
-                // 默认: GCM, PKCS7(实际GCM无填充), 256位, PBKDF2
-                return {
-                    mode: 'AES-GCM',
-                    padding: 'PKCS7',
-                    keyLength: 256,
-                    kdf: 'PBKDF2',
-                    iv: null,
-                    advanced: false
-                };
+                return { mode: 'AES-GCM', padding: 'PKCS7', keyLength: 256, kdf: 'PBKDF2', iv: null, advanced: false };
             }
             const mode = document.getElementById('aesMode').value;
             const padding = document.getElementById('aesPadding').value;
             const keyLength = parseInt(document.getElementById('aesKeyLength').value, 10);
             const kdf = document.getElementById('aesKdf').value;
             const ivHex = document.getElementById('aesIvInput').value.trim();
-            return {
-                mode,
-                padding,
-                keyLength,
-                kdf,
-                iv: ivHex ? hexToUint8Array(ivHex) : null,
-                advanced: true
-            };
+            return { mode, padding, keyLength, kdf, iv: ivHex ? hexToUint8Array(ivHex) : null, advanced: true };
         }
 
-        // 更新 UI 提示
         function updateAesUI() {
             const advanced = document.getElementById('aesAdvancedToggle').checked;
             document.getElementById('aesAdvancedPanel').classList.toggle('show', advanced);
-
             const config = getAesConfig();
-            // 更新徽章
             const modeShort = config.mode.replace('AES-', '');
             document.getElementById('aesEncryptModeBadge').textContent = modeShort;
             document.getElementById('aesDecryptModeBadge').textContent = modeShort;
-
-            // IV 字段显示逻辑: GCM/CBC/CTR 需要 IV, ECB 不需要
             const ivField = document.getElementById('aesIvField');
-            if (advanced && config.mode !== 'AES-ECB') {
-                ivField.style.display = 'block';
-            } else {
-                ivField.style.display = 'none';
-            }
-
-            // 提示
+            if (advanced && config.mode !== 'AES-ECB') ivField.style.display = 'block';
+            else ivField.style.display = 'none';
             let hint = '';
             if (config.mode === 'AES-GCM') hint = 'GCM 模式推荐使用 256 位密钥，PBKDF2 派生。填充模式对 GCM 不生效 (GCM 自带认证)。';
             else if (config.mode === 'AES-CBC') hint = 'CBC 模式需要 IV (16字节)，推荐 PKCS#7 填充。';
             else if (config.mode === 'AES-CTR') hint = 'CTR 模式需要 IV (16字节)，不需要填充。';
             else if (config.mode === 'AES-ECB') hint = '⚠️ ECB 模式不安全，仅用于测试。不需要 IV，需要填充。';
             document.getElementById('aesHint').textContent = hint;
-
-            // 如果 KDF 是 RawKey，密码框提示变化
             const pwdInput = document.getElementById('encryptPassword');
             if (advanced && config.kdf === 'RawKey') {
                 pwdInput.placeholder = '输入密钥 (Hex 或 Base64，长度匹配密钥位数)';
@@ -1336,19 +1425,15 @@
             }
         }
 
-        // 从密码或 RawKey 派生 AES Key
         async function getAesKey(password, config, saltForKdf) {
-            const keyLen = config.keyLength / 8; // bytes
-            let rawKey;
+            const keyLen = config.keyLength / 8;
             if (config.advanced && config.kdf === 'RawKey') {
-                // 尝试解析为 Hex
                 let bytes = null;
                 const trimmed = password.trim();
                 try {
                     if (/^[0-9a-fA-F\s]+$/.test(trimmed) && trimmed.replace(/\s/g, '').length === keyLen * 2) {
                         bytes = hexToUint8Array(trimmed);
                     } else {
-                        // 尝试 Base64
                         const binary = atob(trimmed);
                         bytes = new Uint8Array(binary.length);
                         for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
@@ -1358,15 +1443,11 @@
                 if (!bytes || bytes.length !== keyLen) {
                     throw new Error(`密钥无效：需要 ${config.keyLength} 位 (${keyLen} 字节) 的 Hex 或 Base64 字符串`);
                 }
-                rawKey = bytes;
-                return crypto.subtle.importKey('raw', rawKey, { name: config.mode.replace('AES-', 'AES-') }, false, ['encrypt', 'decrypt']);
+                return crypto.subtle.importKey('raw', bytes, { name: config.mode.replace('AES-', 'AES-') }, false, ['encrypt', 'decrypt']);
             } else {
-                // PBKDF2 派生
                 const salt = saltForKdf || crypto.getRandomValues(new Uint8Array(16));
                 const enc = new TextEncoder();
-                const baseKey = await crypto.subtle.importKey(
-                    'raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']
-                );
+                const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, ['deriveKey']);
                 return crypto.subtle.deriveKey(
                     { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
                     baseKey,
@@ -1377,7 +1458,6 @@
             }
         }
 
-        // 填充函数 (PKCS#7 / ZeroPadding / NoPadding)
         function applyPadding(data, blockSize, paddingMode) {
             if (paddingMode === 'NoPadding') {
                 if (data.length % blockSize !== 0) throw new Error(`NoPadding 模式下数据长度必须是 ${blockSize} 的倍数 (当前: ${data.length})`);
@@ -1390,7 +1470,6 @@
                 padded.set(data);
                 return padded;
             }
-            // PKCS#7
             const padLen = blockSize - (data.length % blockSize);
             const padded = new Uint8Array(data.length + padLen);
             padded.set(data);
@@ -1405,7 +1484,6 @@
                 while (end > 0 && data[end - 1] === 0) end--;
                 return data.slice(0, end);
             }
-            // PKCS#7
             const padLen = data[data.length - 1];
             if (padLen < 1 || padLen > 16) throw new Error('PKCS#7 填充无效');
             for (let i = data.length - padLen; i < data.length; i++) {
@@ -1414,14 +1492,12 @@
             return data.slice(0, data.length - padLen);
         }
 
-        // 加密核心 (支持多种模式)
         async function encryptAESAdvanced(plaintext, password, config) {
             const enc = new TextEncoder();
             const plainBytes = enc.encode(plaintext);
-            const modeName = config.mode.replace('AES-', ''); // GCM, CBC, CTR, ECB
+            const modeName = config.mode.replace('AES-', '');
             const blockSize = 16;
 
-            // 处理 IV
             let iv = null;
             if (modeName !== 'ECB') {
                 if (config.iv) {
@@ -1434,58 +1510,38 @@
                 }
             }
 
-            // 生成盐用于 PBKDF2 (只在非 RawKey 时使用)
             let salt = null;
-            if (config.kdf !== 'RawKey') {
-                salt = crypto.getRandomValues(new Uint8Array(16));
-            }
+            if (config.kdf !== 'RawKey') salt = crypto.getRandomValues(new Uint8Array(16));
 
-            // 密钥
             const key = await getAesKey(password, config, salt);
 
-            // 应用填充 (GCM/CTR 不需要填充，但为统一处理，NoPadding 检查；ECB/CBC 需要)
             let dataToEncrypt = plainBytes;
             if (modeName === 'CBC' || modeName === 'ECB') {
                 dataToEncrypt = applyPadding(plainBytes, blockSize, config.padding);
-            } else {
-                // GCM/CTR 不填充，但如果选择 NoPadding 且长度不对也不报错，因为流模式无块限制
-                // 不过用户可能预期 NoPadding 约束，为了简单，这里不强制
             }
 
-            // 构建算法参数
             const algo = { name: config.mode.replace('AES-', 'AES-') };
-            if (modeName !== 'ECB') {
-                algo.iv = iv;
-            }
+            if (modeName !== 'ECB') algo.iv = iv;
 
-            // 加密
             const ciphertext = await crypto.subtle.encrypt(algo, key, dataToEncrypt);
 
-            // 组装输出: [salt][iv][ciphertext] (Base64)
-            // 只有 PBKDF2 才存 salt；RawKey 不存 salt；ECB 不存 iv
             const parts = [];
             if (salt) parts.push(salt);
             if (iv) parts.push(iv);
             parts.push(new Uint8Array(ciphertext));
 
-            // 合并
             const totalLen = parts.reduce((acc, p) => acc + p.length, 0);
             const combined = new Uint8Array(totalLen);
             let offset = 0;
-            for (const p of parts) {
-                combined.set(p, offset);
-                offset += p.length;
-            }
+            for (const p of parts) { combined.set(p, offset); offset += p.length; }
             return arrayBufferToBase64(combined.buffer);
         }
 
-        // 解密核心
         async function decryptAESAdvanced(cipherBase64, password, config) {
             const combined = new Uint8Array(base64ToArrayBuffer(cipherBase64));
             const modeName = config.mode.replace('AES-', '');
             const blockSize = 16;
 
-            // 确定各部分长度
             let needSalt = (config.kdf !== 'RawKey');
             let needIv = (modeName !== 'ECB');
             let saltLen = needSalt ? 16 : 0;
@@ -1500,16 +1556,11 @@
             offset += ivLen;
             const ciphertext = combined.slice(offset);
 
-            // 密钥
             const key = await getAesKey(password, config, salt);
 
-            // 构建算法参数
             const algo = { name: config.mode.replace('AES-', 'AES-') };
-            if (modeName !== 'ECB') {
-                algo.iv = iv;
-            }
+            if (modeName !== 'ECB') algo.iv = iv;
 
-            // 解密
             let plainBuffer;
             try {
                 plainBuffer = await crypto.subtle.decrypt(algo, key, ciphertext);
@@ -1517,28 +1568,15 @@
                 throw new Error('解密失败: 密码/密钥错误、密文损坏或参数不匹配');
             }
             let plainBytes = new Uint8Array(plainBuffer);
-
-            // 去填充 (CBC/ECB)
             if (modeName === 'CBC' || modeName === 'ECB') {
                 plainBytes = removePadding(plainBytes, config.padding);
             }
-
             return new TextDecoder().decode(plainBytes);
         }
 
-        // UI 元素
         const aesAdvancedToggle = document.getElementById('aesAdvancedToggle');
-        const aesAdvancedPanel = document.getElementById('aesAdvancedPanel');
         const aesMode = document.getElementById('aesMode');
-        const aesPadding = document.getElementById('aesPadding');
-        const aesKeyLength = document.getElementById('aesKeyLength');
         const aesKdf = document.getElementById('aesKdf');
-        const aesIvInput = document.getElementById('aesIvInput');
-        const aesIvField = document.getElementById('aesIvField');
-        const aesHint = document.getElementById('aesHint');
-        const aesEncryptModeBadge = document.getElementById('aesEncryptModeBadge');
-        const aesDecryptModeBadge = document.getElementById('aesDecryptModeBadge');
-
         const encryptPlaintext = document.getElementById('encryptPlaintext');
         const encryptPassword = document.getElementById('encryptPassword');
         const encryptBtn = document.getElementById('encryptBtn');
@@ -1546,7 +1584,6 @@
         const encryptResult = document.getElementById('encryptResult');
         const copyEncryptBtn = document.getElementById('copyEncryptBtn');
         const encryptStatus = document.getElementById('encryptStatus');
-
         const decryptCiphertext = document.getElementById('decryptCiphertext');
         const decryptPassword = document.getElementById('decryptPassword');
         const decryptBtn = document.getElementById('decryptBtn');
@@ -1555,15 +1592,11 @@
         const copyDecryptBtn = document.getElementById('copyDecryptBtn');
         const decryptStatus = document.getElementById('decryptStatus');
 
-        // 高级模式切换
         aesAdvancedToggle.addEventListener('change', updateAesUI);
         aesMode.addEventListener('change', updateAesUI);
         aesKdf.addEventListener('change', updateAesUI);
-
-        // 初始化 UI
         updateAesUI();
 
-        // 加密按钮
         encryptBtn.addEventListener('click', async () => {
             const plain = encryptPlaintext.value;
             const pwd = encryptPassword.value;
@@ -1572,8 +1605,7 @@
             try {
                 setStatus(encryptStatus, '加密中…');
                 const config = getAesConfig();
-                const result = await encryptAESAdvanced(plain, pwd, config);
-                encryptResult.value = result;
+                encryptResult.value = await encryptAESAdvanced(plain, pwd, config);
                 setStatus(encryptStatus, `加密成功 ✅ (${config.mode}${config.advanced ? ', ' + config.padding + ', ' + config.keyLength + '位' : ''})`);
             } catch (err) {
                 setStatus(encryptStatus, '加密失败: ' + err.message, true);
@@ -1597,7 +1629,6 @@
             }
         });
 
-        // 解密按钮
         decryptBtn.addEventListener('click', async () => {
             const cipher = decryptCiphertext.value.trim();
             const pwd = decryptPassword.value;
@@ -1606,8 +1637,7 @@
             try {
                 setStatus(decryptStatus, '解密中…');
                 const config = getAesConfig();
-                const plain = await decryptAESAdvanced(cipher, pwd, config);
-                decryptResult.value = plain;
+                decryptResult.value = await decryptAESAdvanced(cipher, pwd, config);
                 setStatus(decryptStatus, `解密成功 ✅ (${config.mode}${config.advanced ? ', ' + config.padding + ', ' + config.keyLength + '位' : ''})`);
             } catch (err) {
                 setStatus(decryptStatus, '解密失败: ' + err.message, true);
@@ -1633,7 +1663,7 @@
 
         setStatus(encryptStatus, ''); setStatus(decryptStatus, '');
 
-        // ================= 4. RSA 加解密 (支持自定义位数和格式) =================
+        // ================= 4. RSA 加解密 =================
         function rsaArrayBufferToBase64(buffer) {
             const bytes = new Uint8Array(buffer);
             let binary = '';
@@ -1646,91 +1676,50 @@
             for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
             return bytes.buffer;
         }
-
-        // PEM 转 ArrayBuffer
         function pemToArrayBuffer(pem) {
             const b64 = pem.replace(/-----(BEGIN|END) (PUBLIC|PRIVATE|RSA) KEY-----/g, '').replace(/\s/g, '');
             return rsaBase64ToArrayBuffer(b64);
         }
-
-        // ArrayBuffer 转 PEM
         function arrayBufferToPem(buffer, type, isPkcs1 = false) {
             const base64 = rsaArrayBufferToBase64(buffer);
             const lines = base64.match(/.{1,64}/g).join('\n');
             let label = type;
-            if (isPkcs1) {
-                label = 'RSA ' + type;
-            }
+            if (isPkcs1) label = 'RSA ' + type;
             return `-----BEGIN ${label} KEY-----\n${lines}\n-----END ${label} KEY-----`;
         }
 
-        // 获取当前选择的密钥长度和格式
         function getRsaOptions() {
             const bits = parseInt(document.getElementById('rsaModulusLength').value, 10);
             const format = document.getElementById('rsaKeyFormat').value;
             return { bits, format };
         }
 
-        // 导入公钥 (自动检测格式)
         async function importPublicKey(pem) {
             const keyBuffer = pemToArrayBuffer(pem);
             try {
-                return await crypto.subtle.importKey(
-                    'spki',
-                    keyBuffer,
-                    { name: 'RSA-OAEP', hash: 'SHA-256' },
-                    false,
-                    ['encrypt']
-                );
+                return await crypto.subtle.importKey('spki', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
             } catch (e) {
-                return await crypto.subtle.importKey(
-                    'pkcs1',
-                    keyBuffer,
-                    { name: 'RSA-OAEP', hash: 'SHA-256' },
-                    false,
-                    ['encrypt']
-                );
+                return await crypto.subtle.importKey('pkcs1', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['encrypt']);
             }
         }
 
-        // 导入私钥 (自动检测格式)
         async function importPrivateKey(pem) {
             const keyBuffer = pemToArrayBuffer(pem);
             try {
-                return await crypto.subtle.importKey(
-                    'pkcs8',
-                    keyBuffer,
-                    { name: 'RSA-OAEP', hash: 'SHA-256' },
-                    false,
-                    ['decrypt']
-                );
+                return await crypto.subtle.importKey('pkcs8', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']);
             } catch (e) {
-                return await crypto.subtle.importKey(
-                    'pkcs1',
-                    keyBuffer,
-                    { name: 'RSA-OAEP', hash: 'SHA-256' },
-                    false,
-                    ['decrypt']
-                );
+                return await crypto.subtle.importKey('pkcs1', keyBuffer, { name: 'RSA-OAEP', hash: 'SHA-256' }, false, ['decrypt']);
             }
         }
 
-        // 生成 RSA 密钥对
         async function generateRsaKeyPair() {
             const { bits, format } = getRsaOptions();
             const keyPair = await crypto.subtle.generateKey(
-                {
-                    name: 'RSA-OAEP',
-                    modulusLength: bits,
-                    publicExponent: new Uint8Array([1, 0, 1]),
-                    hash: 'SHA-256'
-                },
+                { name: 'RSA-OAEP', modulusLength: bits, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' },
                 true,
                 ['encrypt', 'decrypt']
             );
-
             let publicKeyPem, privateKeyPem;
-
             if (format === 'spki-pkcs8') {
                 const publicKeyBuffer = await crypto.subtle.exportKey('spki', keyPair.publicKey);
                 const privateKeyBuffer = await crypto.subtle.exportKey('pkcs8', keyPair.privateKey);
@@ -1742,35 +1731,23 @@
                 publicKeyPem = arrayBufferToPem(publicKeyBuffer, 'PUBLIC', true);
                 privateKeyPem = arrayBufferToPem(privateKeyBuffer, 'PRIVATE', true);
             }
-
             return { publicKeyPem, privateKeyPem };
         }
 
-        // RSA 加密
         async function rsaEncrypt(plaintext, publicKeyPem) {
             const publicKey = await importPublicKey(publicKeyPem);
             const enc = new TextEncoder();
-            const ciphertext = await crypto.subtle.encrypt(
-                { name: 'RSA-OAEP' },
-                publicKey,
-                enc.encode(plaintext)
-            );
+            const ciphertext = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, publicKey, enc.encode(plaintext));
             return rsaArrayBufferToBase64(ciphertext);
         }
 
-        // RSA 解密
         async function rsaDecrypt(cipherBase64, privateKeyPem) {
             const privateKey = await importPrivateKey(privateKeyPem);
             const cipherBuffer = rsaBase64ToArrayBuffer(cipherBase64);
-            const plaintextBuffer = await crypto.subtle.decrypt(
-                { name: 'RSA-OAEP' },
-                privateKey,
-                cipherBuffer
-            );
+            const plaintextBuffer = await crypto.subtle.decrypt({ name: 'RSA-OAEP' }, privateKey, cipherBuffer);
             return new TextDecoder().decode(plaintextBuffer);
         }
 
-        // RSA UI 元素
         const rsaPublicKey = document.getElementById('rsaPublicKey');
         const rsaPrivateKey = document.getElementById('rsaPrivateKey');
         const rsaPlaintext = document.getElementById('rsaPlaintext');
@@ -1792,7 +1769,6 @@
         const rsaKeyFormat = document.getElementById('rsaKeyFormat');
         const rsaFormatNote = document.getElementById('rsaFormatNote');
 
-        // 更新格式提示
         function updateFormatNote() {
             const format = rsaKeyFormat.value;
             if (format === 'spki-pkcs8') {
@@ -1804,21 +1780,18 @@
         rsaKeyFormat.addEventListener('change', updateFormatNote);
         updateFormatNote();
 
-        // 生成密钥对
         generateRsaKeyPairBtn.addEventListener('click', async () => {
             try {
                 setStatus(rsaEncryptStatus, '生成密钥对中… (2048/3072/4096 位可能需要几秒)');
                 const { publicKeyPem, privateKeyPem } = await generateRsaKeyPair();
                 rsaPublicKey.value = publicKeyPem;
                 rsaPrivateKey.value = privateKeyPem;
-                const bits = rsaModulusLength.value;
-                setStatus(rsaEncryptStatus, `密钥对生成成功 ✅ (${bits} 位，格式: ${rsaKeyFormat.value === 'spki-pkcs8' ? 'SPKI/PKCS#8' : 'PKCS#1'})`);
+                setStatus(rsaEncryptStatus, `密钥对生成成功 ✅ (${rsaModulusLength.value} 位，格式: ${rsaKeyFormat.value === 'spki-pkcs8' ? 'SPKI/PKCS#8' : 'PKCS#1'})`);
             } catch (err) {
                 setStatus(rsaEncryptStatus, '生成失败: ' + err.message, true);
             }
         });
 
-        // 复制公钥/私钥
         copyPublicKeyBtn.addEventListener('click', () => {
             if (rsaPublicKey.value) {
                 navigator.clipboard.writeText(rsaPublicKey.value).then(() => {
@@ -1844,7 +1817,6 @@
             }
         });
 
-        // RSA 加密
         rsaEncryptBtn.addEventListener('click', async () => {
             const pubKey = rsaPublicKey.value.trim();
             const plain = rsaPlaintext.value;
@@ -1877,7 +1849,6 @@
             }
         });
 
-        // RSA 解密
         rsaDecryptBtn.addEventListener('click', async () => {
             const privKey = rsaPrivateKey.value.trim();
             const cipher = rsaCiphertextInput.value.trim();
